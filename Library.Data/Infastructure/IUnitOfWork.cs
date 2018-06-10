@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Library.Data
+namespace Library.Data.Infastructure
 {
-    public class Class1
+    public interface IUnitOfWork
     {
+        void Commit();
     }
 }
