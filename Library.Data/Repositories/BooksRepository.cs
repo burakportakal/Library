@@ -16,13 +16,16 @@ namespace Library.Data
 
         public Books GetById(string isbn)
         {
-            return DbContext.Books.Include(e => e.Authors).FirstOrDefault(i => i.Isbn == isbn);
+            return DbContext.Books
+                .Include(e => e.Authors)
+                .Include(e => e.Reserve)
+                .FirstOrDefault(i => i.Isbn == isbn);
         }
 
         public override IEnumerable<Books> GetAll()
         {
            
-            return DbContext.Books.Include(e => e.Authors);
+            return DbContext.Books.Include(e => e.Authors).Include(e => e.Reserve);
         }
 
         public void Delete(string isbn)

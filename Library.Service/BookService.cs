@@ -15,7 +15,7 @@ namespace Library.Service
         IEnumerable<Authors> GetBooksAuthors(string isbn);
         Books GetBook(string isbn);
         void AddBook(Books book);
-        void SaveBook();
+        void SaveChanges();
         void UpdateBook(Books book);
         void DeleteBook(string isbn );
     }
@@ -48,7 +48,7 @@ namespace Library.Service
             booksRepository.Add(book);
         }
 
-        public void SaveBook()
+        public void SaveChanges()
         {
             unitOfWork.Commit();
         }

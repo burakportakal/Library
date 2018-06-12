@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Library.Model;
+using Library.Web.Models;
+
 namespace Library.Web
 {
     public static class Factory
@@ -17,14 +19,23 @@ namespace Library.Web
             return new Authors();
         }
 
-        public static IReserve GetReserveInstace()
+        public static IReserve GetReserveInstace(string userId, Books book)
         {
-            return new Reserve();
+            return new Reserve
+            {
+                UserId = userId,
+                Books = book
+            };
         }
 
         public static IApplicationUser GetApplicationUserInstance()
         {
             return new ApplicationUser();
+        }
+
+        public static IReserveViewModel GetReserveViewModel()
+        {
+            return new ReserveViewModel();
         }
     }
 }

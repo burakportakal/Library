@@ -1,4 +1,4 @@
-﻿var token = sessionStorage.getItem("accessToken");
+﻿var token =  window.localStorage["accessToken"];
 var headers = {};
 if (token) {
     headers.Authorization = 'Bearer ' + token;
@@ -14,6 +14,7 @@ $(function () {
                headers:headers,
                success: function () {
                    sessionStorage.clear();
+                   localStorage.clear();
                    window.location.href = "/";
                },
                error: function (error) {
@@ -144,9 +145,10 @@ function loadData() {
 
 function createTable(data) {
     var x = "<tbody id='bookValues'>";
-     x += "<tr>";
+     
     for (var i = 0; i < data.length; i++) {
-        x += "<th>" + data[i].Isbn + "</th>";
+        x += "<tr>";
+        x += "<th><a href='/bookoperations/bookindex/" + data[i].Isbn + "'>"+data[i].Isbn+"</a></th>";
         x += "<th>" + data[i].BookTitle + "</th>";
         x += "<th>";
         for (var j = 0; j < data[i].Authors.length; j++) {
@@ -154,13 +156,52 @@ function createTable(data) {
         }
         x += "</th>";
         x += "<th>" + data[i].PublishYear + "</th>";
-        x += "<th>" + data[i].BookCount + "</th>";
+        x += "<th>" + data[i].Count + "</th>";
         x += "<th><a class='badge badge-primary' href=/bookoperations/edit/" + data[i].Isbn + ">Düzenle</a></th>";
         x += "<th><a class='badge badge-primary' id='deleteBook' data-id='" + data[i].Isbn + "' href=/bookoperations/delete/" + data[i].Isbn + ">Sil</a></th>";
         x += "</tr>";
     }
     x += "</tbody>";
     $("#bookData").append(x);
+}
+function loadReserveData(isbn) {
+    $.ajax({
+        type: "GET",
+        url: "/api/books?isbn=" + isbn,
+        headers: headers,
+        success: function (data) {
+            createReserveTable(data);
+        }
+    });
+}
+
+function createReserveTable(data) {
+    var x = "<tbody id='bookValues'>";
+   
+    for (var i = 0; i < data.Reserves.length; i++) {
+        var reserveState = data.Reserves[i].ReserveState;
+        if (reserveState==0) {
+            x += "<tr class='table-primary'>";
+        } else if (reserveState == 1) {
+            x += "<tr class=\"table-success\">";
+        } else {
+            x += "<tr class=\"table-danger\"> ";
+        }
+        x += "<th>" + data.Isbn + "</th>";
+        x += "<th>" + data.BookTitle + "</th>";
+        x += "<th>";
+        for (var j = 0; j < data.Authors.length; j++) {
+            x += data.Authors[j].AuthorName + ", ";
+        }
+        x += "</th>";
+        x += "<th>" + data.Count + "</th>";
+        x += "<th>" + data.Reserves[i].ReserveDate + "</th>";
+        x += "<th>" + data.Reserves[i].ReturnDate + "</th>";
+        x += "<th>" + data.Reserves[i].UserReturnedDate + "</th>";
+        x += "</tr>";
+    }
+    x += "</tbody>";
+    $("#bookReserveData").append(x);
 }
 function updateBook(url){
     var authors = $("#author").val();
@@ -203,7 +244,7 @@ function loadEditBook(url) {
             $("#bookTitle").val(data.BookTitle);
             $("#isbn").val(data.Isbn);
             $("#publishYear").val(data.PublishYear);
-            $("#count").val(data.BookCount);
+            $("#count").val(data.Count);
             for (var i = 0; i < data.Authors.length; i++) {
                 authors += data.Authors[i].AuthorName + ",";
             }

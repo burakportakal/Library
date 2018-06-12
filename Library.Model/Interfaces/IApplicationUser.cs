@@ -4,7 +4,7 @@ using Microsoft.AspNet.Identity;
 
 namespace Library.Model
 {
-    public interface IApplicationUser
+    public interface IApplicationUser 
     {
         Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager, string authenticationType);
         string Email { get; set; }

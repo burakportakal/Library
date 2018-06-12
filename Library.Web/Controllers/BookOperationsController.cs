@@ -23,5 +23,10 @@ namespace Library.Web.Controllers
         {
             return View();
         }
+
+        public ActionResult BookIndex()
+        {
+            return View();
+        }
     }
 }

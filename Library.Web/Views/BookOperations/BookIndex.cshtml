@@ -1,0 +1,57 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div id="table" class="container">
+    <table id="bookReserveData" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Isbn</th>
+                <th>Kitap Adı</th>
+                <th>Yazar</th>
+                <th>Adet</th>
+                <th>Kiralanma Tarihi</th>
+                <th>Kira Süresi</th>
+                <th>İade Tarihi</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+
+
+
+
+<hr />
+<footer>
+    <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+</footer>
+</div>
+
+
+@Scripts.Render("~/bundles/bootstrap")
+
+<script src='../../Scripts/jquery-3.3.1.min.js'></script>
+<script src="../../Scripts/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+<script src='../../Scripts/materialize.min.js'></script>
+<script src="../../Scripts/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="../../Scripts/layout.js"></script>
+<script src="../../Scripts/storage.js"></script>
+<script>
+    $(document).ready(function () {
+        var isbn = "@Request.Url.AbsolutePath";
+        isbn = isbn.split("/");
+        if (isbn.length == 4) {
+            isbn = isbn[3];
+            loadReserveData(isbn);
+        } else {
+            return null;
+        }
+    });
+    function redirect() {
+        window.location.href = "/bookoperations/create";
+    }
+</script>
+</body>
+</html>

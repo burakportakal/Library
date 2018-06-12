@@ -15,9 +15,16 @@ namespace Library.Service
         Reserve GetReserve(int id);
         Reserve GetReserveByUserId(string isbn,string userId);
         IEnumerable<Reserve> GetAllReservesByUserId(string userId);
+        /// <summary>
+        /// Get list of books user not returned.
+        /// </summary>
+        /// <param name="userId">User Identifier</param>
+        /// <returns></returns>
         IEnumerable<Reserve> GetBooksUserStillHave(string userId);
+
+        void UpdateReserve(Reserve reserve);
         void AddReserve(Reserve reserve);
-        void SaveReserve();
+        void SaveChanges();
 
     }
     public class ReserveService: IReserveService
@@ -55,6 +62,10 @@ namespace Library.Service
             return reserveReposityory.GetUsersNotReturnedBooksByUserId(userId);
         }
 
+        public void UpdateReserve(Reserve reserve)
+        {
+            reserveReposityory.Update(reserve);
+        }
         public void AddReserve(Reserve reserve)
         {
             var isUserHasPesmission = reserveReposityory.GetUsersNotReturnedBooksByUserId(reserve.UserId).Count <= 3;
@@ -68,7 +79,7 @@ namespace Library.Service
             }
         }
 
-        public void SaveReserve()
+        public void SaveChanges()
         {
             unitOfWork.Commit();
         }

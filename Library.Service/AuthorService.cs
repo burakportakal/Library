@@ -16,7 +16,7 @@ namespace Library.Service
         Authors GetAuthor(int id);
         Authors GetAuthor(string authorName);
         void AddAuthor(Authors author);
-        void SaveAuthor();
+        void SaveChanges();
     }
     public class AuthorService :IAuthorService
     {
@@ -51,7 +51,7 @@ namespace Library.Service
         {
             authorRepository.Add(author);
         }
-        public void SaveAuthor()
+        public void SaveChanges()
         {
            unitOfWork.Commit();
         }
