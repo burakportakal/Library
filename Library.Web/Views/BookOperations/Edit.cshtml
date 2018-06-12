@@ -1,0 +1,68 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<form id="updateBook" action="/api/books" method="post">
+    <div class="form-group">
+        <label for="bookTitle">Kitap Adı</label>
+        <input class="form-control" type="text" id="bookTitle" name="BookTitle" placeholder="Kitap adı">
+    </div>
+    <div class="form-group">
+        <label for="Isbn">Isbn</label>
+        <input class="form-control" type="text" id="isbn" name="Isbn" placeholder="Isbn">
+    </div>
+    <div class="form-group">
+        <label for="publishYear">Çıkış Yılı</label>
+        <input class="form-control" type="text" id="publishYear" name="PublishYear" placeholder="Çıkış yılı">
+    </div>
+    <div class="form-group">
+        <label for="count">Kaç Adet</label>
+        <input class="form-control" type="text" id="count" name="Count" placeholder="Adet">
+    </div>
+    <div class="form-group">
+        <label for="author">Yazarlar</label>
+        <textarea class="form-control" name="Author" id="author" rows="3" placeholder="Virgül ile ayrılmış yazarlar(Yazar 1,Yazar 2)"></textarea>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary mb-2 ">Submit</button>
+    </div>
+</form>
+<hr />
+<footer>
+    <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+</footer>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
+
+<script src='https://code.jquery.com/jquery-3.3.1.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="../../Scripts/layout.js"></script>
+<script>
+    $(document).ready(function() {
+        var url = "@Request.Url.AbsolutePath";
+        url = url.split("/");
+        if (url.length == 4) {
+            url = url[3];
+            loadEditBook(url);
+        } else {
+            return null;
+        }
+    });
+    $("#updateBook").submit(function(e) {
+        e.preventDefault();
+        var url = "@Request.Url.AbsolutePath";
+        url = url.split("/");
+        if (url.length == 4) {
+            url = url[3];
+        } else {
+            return null;
+        }
+        updateBook(url);
+    });
+</script>
+</body>
+</html>

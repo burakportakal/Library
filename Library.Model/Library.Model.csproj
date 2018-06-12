@@ -60,7 +60,11 @@
     <Compile Include="Models\ApplicationUser.cs" />
     <Compile Include="Models\Authors.cs" />
     <Compile Include="Models\Books.cs" />
-    <Compile Include="Models\Reserve.cs" />
+    <Compile Include="Interfaces\IApplicationUser.cs" />
+    <Compile Include="Interfaces\IAuthors.cs" />
+    <Compile Include="Interfaces\IBooks.cs" />
+    <Compile Include="Models\IReserve.cs" />
+    <Compile Include="Interfaces\Reserve.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

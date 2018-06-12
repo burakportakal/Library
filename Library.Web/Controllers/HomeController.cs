@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using Library.Model;
+﻿using System.Web.Mvc;
 using Library.Service;
 
 namespace Library.Web.Controllers
@@ -25,6 +20,34 @@ namespace Library.Web.Controllers
         {
             ViewBag.Title = "Home Page";
             return View();
+            
+        }
+        public ActionResult Register()
+        {
+            ViewBag.show = "Register";
+            return View();
+        }
+
+        public ActionResult Login()
+        {
+            ViewBag.Show = "Login";
+            return View("Register");
+        }
+        public ActionResult RegisterPartial()
+        {
+            return PartialView("RegisterPartial");
+        }
+
+        public ActionResult LoginPartial()
+        {
+            return PartialView("LoginPartial");
+        }
+
+        public ActionResult Logout()
+        {
+            return RedirectToAction("Index");
         }
     }
+
+  
 }

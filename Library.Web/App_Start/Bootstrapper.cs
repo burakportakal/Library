@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Web;
+using System.Web.Http;
 using System.Web.Mvc;
 using Autofac;
 using Autofac.Integration.Mvc;
@@ -17,6 +18,7 @@ namespace Library.Web.App_Start
         public static void Run()
         {
             SetAutofacContainer();
+            AutofacWebapiConfig.Initialize(GlobalConfiguration.Configuration);
         }
 
         private static void SetAutofacContainer()

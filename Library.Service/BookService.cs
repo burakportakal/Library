@@ -16,6 +16,8 @@ namespace Library.Service
         Books GetBook(string isbn);
         void AddBook(Books book);
         void SaveBook();
+        void UpdateBook(Books book);
+        void DeleteBook(string isbn );
     }
     public class BookService : IBookService
     {
@@ -49,6 +51,16 @@ namespace Library.Service
         public void SaveBook()
         {
             unitOfWork.Commit();
+        }
+
+        public void UpdateBook(Books book)
+        {
+            booksRepository.Update(book);
+        }
+
+        public void DeleteBook(string isbn)
+        {
+            booksRepository.Delete(isbn);
         }
     }
 }
