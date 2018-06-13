@@ -29,34 +29,36 @@ namespace Library.Web.App_Start
         {
             //Register your Web API controllers.  
             builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
-            builder.RegisterType<UnitOfWork>().As<IUnitOfWork>().InstancePerRequest();
+            builder.RegisterType<UnitOfWork>().As<IUnitOfWork>().InstancePerLifetimeScope();
             builder.RegisterType<LibraryEntities>()
                 .As<DbContext>()
-                .InstancePerRequest();
+                .InstancePerLifetimeScope();
 
             builder.RegisterType<DbFactory>()
                 .As<IDbFactory>()
-                .InstancePerRequest();
+                .InstancePerLifetimeScope();
 
             builder.RegisterType<ReserveRepository>()
                 .As<IReserveRepository>()
-                .InstancePerRequest();
+                .InstancePerLifetimeScope();
             builder.RegisterType<AuthorRepository>()
                 .As<IAuthorRepository>()
-                .InstancePerRequest();
+                .InstancePerLifetimeScope();
             builder.RegisterType<BooksRepository>()
                 .As<IBooksRepository>()
-                .InstancePerRequest();
+                .InstancePerLifetimeScope();
+            builder.RegisterType<LogRepository>().As<ILogRepository>().InstancePerLifetimeScope();
 
             builder.RegisterType<AuthorService>()
                 .As<IAuthorService>()
-                .InstancePerRequest();
+                .InstancePerLifetimeScope();
             builder.RegisterType<BookService>()
                 .As<IBookService>()
-                .InstancePerRequest();
+                .InstancePerLifetimeScope();
             builder.RegisterType<ReserveService>()
                 .As<IReserveService>()
-                .InstancePerRequest();
+                .InstancePerLifetimeScope();
+            builder.RegisterType<LogService>().As<ILogService>().InstancePerLifetimeScope();
 
             
             //Set the dependency resolver to be Autofac.  

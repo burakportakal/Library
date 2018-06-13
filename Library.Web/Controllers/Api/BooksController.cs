@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Library.Model;
@@ -43,6 +41,7 @@ namespace Library.Web.Controllers
             }
         }
         // GET: api/Books
+        [AllowAnonymous]
         public IEnumerable<BookViewModel> Get()
         {
             var booksList = bookService.GetBooks();
@@ -57,6 +56,7 @@ namespace Library.Web.Controllers
         }
 
         // GET: api/Books?isbn={isbn}
+       [Route("{isbn}")]
         public HttpResponseMessage Get(string isbn)
         {
             var book = bookService.GetBook(isbn);
@@ -87,6 +87,10 @@ namespace Library.Web.Controllers
         [Authorize(Roles = "Admin")]
         public HttpResponseMessage Post(CreateBookViewModel value)
         {
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
+            }
             List<Authors> authorList = new List<Authors>();
             var book = Mapper.Map<CreateBookViewModel, Books>(value);
             foreach (var author in value.Author)
@@ -116,8 +120,13 @@ namespace Library.Web.Controllers
 
         // PUT: api/Books?={isbn}
         [Authorize(Roles = "Admin")]
+        [Route("{isbn}")]
         public HttpResponseMessage Put(string isbn, CreateBookViewModel value)
         {
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
+            }
             List<Authors> authorList = new List<Authors>();
             var book = Mapper.Map<CreateBookViewModel, Books>(value);
             foreach (var author in value.Author)
@@ -147,6 +156,7 @@ namespace Library.Web.Controllers
 
         // DELETE: api/Books?isbn={isbn}
         [Authorize(Roles = "Admin")]
+        [Route("{isbn}")]
         public HttpResponseMessage Delete(string isbn)
         {
             try
@@ -162,21 +172,25 @@ namespace Library.Web.Controllers
         }
 
         // POST api/books/reserve?isbn={isbn}
-        [Route("Reserve")]
+        [Route("Reserve/{isbn}")]
         public HttpResponseMessage PostReserve(string isbn)
         {
             var book = bookService.GetBook(isbn);
             if(book == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             if (book.BookCount == 0)
-                return Request.CreateResponse(HttpStatusCode.BadRequest,"Bu kitaptan kütüphanede kalmamıştır.");
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new { message = "Bu kitaptan kütüphanede kalmamıştır."});
             var userId = User.Identity.GetUserId();
             // Kullanıcı kaç tane kiralık kitaba sahip.
             var reservedBooks = reserveService.GetBooksUserStillHave(userId);
             //Aynı kitabı iki kere vermeyelim
             var userReservedThisBook = reservedBooks.Any(e => e.Isbn == isbn);
+            if (userReservedThisBook)
+            {
+                return Request.CreateResponse(HttpStatusCode.Forbidden,new {message = "Bu kitap elinizde olduğu için tekrar kiralayamazsınız!"});
+            }
 
-            if (reservedBooks.Count() < 3 && !userReservedThisBook)
+            if (reservedBooks.Count() < 3)
             {
                 var reserve = Factory.GetReserveInstace(userId,book);
                 reserveService.AddReserve((Reserve)reserve);
@@ -203,17 +217,37 @@ namespace Library.Web.Controllers
                 }
                 
             }
-            return Request.CreateResponse(HttpStatusCode.Forbidden);
+            return Request.CreateResponse(HttpStatusCode.Forbidden, new { message = "Aynı anda sadece 3 kitap kiralayabilirsiniz!" });
         }
         // GET api/books/reserve
         [Route("Reserve")]
         public IEnumerable<ReserveViewModel> GetReserve()
         {
             var reserves = reserveService.GetAllReservesByUserId(User.Identity.GetUserId());
-            return Mapper.Map<IEnumerable<Reserve>, IEnumerable<ReserveViewModel>>(reserves);
+            var reserveList =Mapper.Map<IEnumerable<Reserve>, IEnumerable<ReserveViewModel>>(reserves);
+            foreach (var reserve in reserveList)
+            {
+                var book = bookService.GetBook(reserve.Isbn);
+                var authors = Mapper.Map<List<Authors>, List<AuthorViewModel>>(book.Authors.ToList());
+                reserve.Authors = authors;
+                if (reserve.UserReturnedDate == null && DateTime.Compare(DateTime.Now, reserve.ReturnDate) <= 0)
+                {
+                    reserve.ReserveState = ReserveState.Reserved;
+                }
+                else if (reserve.UserReturnedDate == null && DateTime.Compare(DateTime.Now, reserve.ReturnDate) > 0)
+                {
+                    reserve.ReserveState = ReserveState.NotReturned;
+                }
+                else
+                {
+                    reserve.ReserveState = ReserveState.Returned;
+                }
+            }
+
+            return reserveList;
         }
         // PUT api/books/reserve?isbn={isbn}
-        [Route("Reserve")]
+        [Route("Reserve/{reserveId}")]
         public HttpResponseMessage PutReserve(int reserveId)
         {
             var reserve = reserveService.GetReserve(reserveId);

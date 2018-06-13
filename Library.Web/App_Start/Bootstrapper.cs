@@ -24,32 +24,40 @@ namespace Library.Web.App_Start
         private static void SetAutofacContainer()
         {
             var builder = new ContainerBuilder();
+           
             builder.RegisterControllers(Assembly.GetExecutingAssembly());
-            builder.RegisterType<UnitOfWork>().As<IUnitOfWork>().InstancePerRequest();
-            builder.RegisterType<DbFactory>().As<IDbFactory>().InstancePerRequest();
+            builder.RegisterType<LogService>().As<ILogService>().InstancePerLifetimeScope();
+            builder.RegisterType<UnitOfWork>().As<IUnitOfWork>().InstancePerLifetimeScope();
+            builder.RegisterType<DbFactory>().As<IDbFactory>().InstancePerLifetimeScope();
 
             //repositories
             builder.RegisterAssemblyTypes(typeof(AuthorRepository).Assembly)
                 .Where(t => t.Name.EndsWith("Repository"))
-                .AsImplementedInterfaces().InstancePerRequest();
+                .AsImplementedInterfaces().InstancePerLifetimeScope();
             builder.RegisterAssemblyTypes(typeof(BooksRepository).Assembly)
                 .Where(t => t.Name.EndsWith("Repository"))
-                .AsImplementedInterfaces().InstancePerRequest();
+                .AsImplementedInterfaces().InstancePerLifetimeScope();
             builder.RegisterAssemblyTypes(typeof(ReserveRepository).Assembly)
                 .Where(t => t.Name.EndsWith("Repository"))
-                .AsImplementedInterfaces().InstancePerRequest();
+                .AsImplementedInterfaces().InstancePerLifetimeScope();
+            builder.RegisterAssemblyTypes(typeof(LogRepository).Assembly)
+                .Where(t => t.Name.EndsWith("Repository"))
+                .AsImplementedInterfaces().InstancePerLifetimeScope();
 
             // Services
 
             builder.RegisterAssemblyTypes(typeof(AuthorService).Assembly)
                 .Where(t => t.Name.EndsWith("Service"))
-                .AsImplementedInterfaces().InstancePerRequest();
+                .AsImplementedInterfaces().InstancePerLifetimeScope();
             builder.RegisterAssemblyTypes(typeof(BookService).Assembly)
                 .Where(t => t.Name.EndsWith("Service"))
-                .AsImplementedInterfaces().InstancePerRequest();
+                .AsImplementedInterfaces().InstancePerLifetimeScope();
             builder.RegisterAssemblyTypes(typeof(ReserveService).Assembly)
                 .Where(t => t.Name.EndsWith("Service"))
-                .AsImplementedInterfaces().InstancePerRequest();
+                .AsImplementedInterfaces().InstancePerLifetimeScope();
+            builder.RegisterAssemblyTypes(typeof(LogService).Assembly)
+                .Where(t => t.Name.EndsWith("Service"))
+                .AsImplementedInterfaces().InstancePerLifetimeScope();
 
             IContainer container = builder.Build();
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));

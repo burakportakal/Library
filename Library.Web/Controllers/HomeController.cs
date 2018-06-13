@@ -5,17 +5,6 @@ namespace Library.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IBookService bookService;
-        private readonly IReserveService reserveService;
-        private readonly IAuthorService authorService;
-
-        public HomeController(IBookService bookService, 
-            IReserveService reserveService, IAuthorService authorService)
-        {
-            this.bookService = bookService;
-            this.reserveService = reserveService;
-            this.authorService = authorService;
-        }
         public ActionResult Index()
         {
             ViewBag.Title = "Home Page";
@@ -46,6 +35,11 @@ namespace Library.Web.Controllers
         public ActionResult Logout()
         {
             return RedirectToAction("Index");
+        }
+        [Authorize]
+        public ActionResult Profile()
+        {
+            return View();
         }
     }
 

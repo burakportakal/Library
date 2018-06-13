@@ -35,6 +35,7 @@ namespace Library.Web
                     .ForMember(bookTitle => bookTitle.BookTitle,
                         settings => settings.MapFrom(reserve => reserve.Books.BookTitle))
                     .ForSourceMember(book => book.User, opt => opt.Ignore());
+                
 
                 e.CreateMap<CreateBookViewModel, Books>()
                     .ForMember(dest => dest.Isbn, source =>
@@ -91,8 +92,8 @@ namespace Library.Web
                     .ForSourceMember(author => author.Books, opt => opt.Ignore())
                     .ForSourceMember(author => author.AuthorsId, opt => opt.Ignore());
                  e.CreateMap<Reserve, ReserveBookViewModel>()
-                           .ForMember(reserveViewModel => reserveViewModel.UserId,
-                               destReserve => destReserve.MapFrom(reserve => reserve.UserId))
+                           .ForMember(reserveViewModel => reserveViewModel.UserName,
+                               destReserve => destReserve.MapFrom(reserve => reserve.User.UserName))
                            .ForMember(reserveViewModel => reserveViewModel.ReserveDate,
                                destReserve => destReserve.MapFrom(reserve => reserve.DateReserved))
                            .ForMember(reserveViewModel => reserveViewModel.ReserveId,

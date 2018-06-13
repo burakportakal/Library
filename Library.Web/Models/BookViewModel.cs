@@ -27,7 +27,7 @@ namespace Library.Web.Models
     public class ReserveBookViewModel
     {
         public int ReserveId { get; set; }
-        public string UserId { get; set; }
+        public string UserName { get; set; }
         public ReserveState ReserveState { get; set; }
         public DateTime ReserveDate { get; set; }
         public DateTime ReturnDate { get; set; }

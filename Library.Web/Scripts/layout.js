@@ -93,7 +93,7 @@ $(function () {
         var self = $(this);
             $.ajax({
                 type: "DELETE",
-                url: "/api/books?isbn=" + self.attr("data-id"),
+                url: "/api/books/" + self.attr("data-id"),
                 headers: headers,
                 success: function() {
                     alert("kitap başarıyla silindi");
@@ -167,7 +167,7 @@ function createTable(data) {
 function loadReserveData(isbn) {
     $.ajax({
         type: "GET",
-        url: "/api/books?isbn=" + isbn,
+        url: "/api/books/" + isbn,
         headers: headers,
         success: function (data) {
             createReserveTable(data);
@@ -177,30 +177,38 @@ function loadReserveData(isbn) {
 
 function createReserveTable(data) {
     var x = "<tbody id='bookValues'>";
-   
+    var reservedCount = 0;
+    var bookCount = data.Count;
     for (var i = 0; i < data.Reserves.length; i++) {
         var reserveState = data.Reserves[i].ReserveState;
-        if (reserveState==0) {
+        if (reserveState == 0) {
+            reservedCount++;
             x += "<tr class='table-primary'>";
         } else if (reserveState == 1) {
             x += "<tr class=\"table-success\">";
         } else {
+            reservedCount++;
             x += "<tr class=\"table-danger\"> ";
         }
-        x += "<th>" + data.Isbn + "</th>";
-        x += "<th>" + data.BookTitle + "</th>";
-        x += "<th>";
-        for (var j = 0; j < data.Authors.length; j++) {
-            x += data.Authors[j].AuthorName + ", ";
+        x += "<th>" + data.Reserves[i].UserName + "</th>";
+        var date = new Date(data.Reserves[i].ReserveDate);
+        
+        x += "<th>" + date.format("dd.mm.yyyy") + "</th>";
+        date = new Date(data.Reserves[i].ReturnDate);
+        x += "<th>" + date.format("dd.mm.yyyy") + "</th>";
+        if (data.Reserves[i].UserReturnedDate != null) {
+            date = new Date(data.Reserves[i].UserReturnedDate);
+            x += "<th>" + date.format("dd.mm.yyyy") + "</th>";
+        } else {
+            x += "<th></th>";
         }
-        x += "</th>";
-        x += "<th>" + data.Count + "</th>";
-        x += "<th>" + data.Reserves[i].ReserveDate + "</th>";
-        x += "<th>" + data.Reserves[i].ReturnDate + "</th>";
-        x += "<th>" + data.Reserves[i].UserReturnedDate + "</th>";
         x += "</tr>";
     }
     x += "</tbody>";
+    bookCount = bookCount + reservedCount;
+    $("#bookCount").append("Toplam kitap sayisi: " + bookCount + " " +
+        "Kütüphanede bulunan kitap sayisi: "+ (bookCount - reservedCount)+
+        " Kirada olan kitap sayisi: "+reservedCount);
     $("#bookReserveData").append(x);
 }
 function updateBook(url){
@@ -220,7 +228,7 @@ function updateBook(url){
     };
     $.ajax({
         type: "PUT",
-        url: "/api/books?isbn="+url,
+        url: "/api/books/"+url,
         data: postData,
         headers: headers,
 
@@ -238,7 +246,7 @@ function loadEditBook(url) {
     var authors = "";
     $.ajax({
         type: "GET",
-        url: "/api/books?isbn=" + url,
+        url: "/api/books/" + url,
         headers: headers,
         success: function (data) {
             $("#bookTitle").val(data.BookTitle);

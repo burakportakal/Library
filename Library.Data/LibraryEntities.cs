@@ -16,6 +16,7 @@ namespace Library.Data
         public DbSet<Authors> Authors { get; set; }
         public DbSet<Books> Books { get; set; }
         public DbSet<Reserve> Reserve { get; set; }
+        public DbSet<Log> Log { get; set; }
 
         public virtual void Commit()
         {

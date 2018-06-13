@@ -47,12 +47,19 @@
             data: data,
             success: function (response) {
                 window.localStorage['accessToken'] = response.access_token;
-                var returnUrl =getParameterByName("returnUrl");
-                window.location.href = returnUrl;
+                var returnUrl = getParameterByName("returnUrl");
+                if (returnUrl != null) {
+                    window.location.href = returnUrl;
+                } else {
+                    window.location.href = "/";
+                }
             },
             statusCode: {
                 404: function () {
-                    alert("Incorrect email or password")
+                    alert("Incorrect email or password");
+                },
+                400: function () {
+                    alert("Incorrect email or password");
                 }
             }
         });

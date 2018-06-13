@@ -37,5 +37,10 @@ namespace Library.Web
         {
             return new ReserveViewModel();
         }
+
+        public static ILog GetLogInstance()
+        {
+            return new Log();
+        }
     }
 }

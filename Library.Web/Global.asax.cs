@@ -7,7 +7,9 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Library.Data;
+using Library.Service;
 using Library.Web.App_Start;
+using Library.Web.Logger;
 
 namespace Library.Web
 {
@@ -15,6 +17,7 @@ namespace Library.Web
     {
         protected void Application_Start()
         {
+           
             System.Data.Entity.Database.SetInitializer(new LibrarySeedData());
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
@@ -22,6 +25,7 @@ namespace Library.Web
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             Bootstrapper.Run();
+            GlobalConfiguration.Configuration.MessageHandlers.Add(new MessageHandler());
         }
     }
 }
