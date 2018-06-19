@@ -10,11 +10,11 @@ namespace Library.Model
     {
         public int ReserveId { get; set; }
         public string UserId { get; set; }
-        public string Isbn { get; set; }
+        public string BookId { get; set; }
         public DateTime DateReserved { get; set; }
         public DateTime CalculatedReturnDate { get; set; }
         public DateTime? UserReturnedDate { get; set; }
-        public virtual Books Books { get; set; }
+        public virtual BookIds BookIds { get; set; }
         public virtual ApplicationUser User { get; set; }
 
         public Reserve()

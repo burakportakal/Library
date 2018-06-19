@@ -4,11 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
-
-    <link rel="stylesheet" href="../../Content/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-    
     @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
 </head>
 
 <body>
@@ -21,19 +17,19 @@
 
             <div class="collapse navbar-collapse" id="navbarColor01">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                    <li id="main-page" class="nav-item active">
+                        <a class="nav-link" href="/">Ana Sayfa <span class="sr-only">(current)</span></a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/bookoperations">Books</a>
+                    <li id="admin" class="nav-item">
+                        <a class="nav-link" href="/bookoperations">Admin</a>
                     </li>
                 @if (User.Identity.IsAuthenticated)
                 {
-                    <li class="nav-item">
-                        <a class="nav-link" href="/home/profile">Books</a>
+                    <li id="my-books" class="nav-item">
+                        <a class="nav-link" href="/home/profile">Kitaplarım</a>
                     </li>
                 }
-                    <li class="nav-item">
+                    <li id="api-help" class="nav-item">
                         <a class="nav-link" href="/help">API Help</a>
                     </li>
                 </ul>
@@ -41,17 +37,17 @@
                     @if (!User.Identity.IsAuthenticated)
                     { 
                         <li class="nav-item">
-                            <a class="nav-link" style="color: #f8f8f8" href="/home/login?returnUrl=@Request.Url.AbsolutePath">Login</a>
+                            <a class="nav-link" style="color: #f8f8f8" href="/home/login?returnUrl=@Request.Url.AbsolutePath">Giriş</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" style="color: #f8f8f8" href="/home/register">Register</a>
+                            <a class="nav-link" style="color: #f8f8f8" href="/home/register">Kayıt Ol</a>
                         </li>
                     }
                     else
                     {
                         <li class="nav-item"><a style="color: #f8f8f8" class="nav-link" href="/profile">@User.Identity.Name</a></li>
                         <li>
-                            <button class="btn btn-outline-info my-2 my-sm-0" id="logout">Logout</button>
+                            <button class="btn btn-outline-info my-2 my-sm-0" id="logout">Çıkış</button>
                         </li>
                     }
                 </ul>
@@ -61,20 +57,16 @@
     </div>
     <div class="container body-content">
         @RenderBody()
-      
-
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+            <p>&copy; @DateTime.Now.Year - Library Application</p>
     </footer>
 </div>
-     
-<script src='../../Scripts/jquery-3.3.1.min.js'></script>
-<script src="../../Scripts/bootstrap.min.js"></script>
-<script src='../../Scripts/materialize.min.js'></script>
-<script src="../../Scripts/popper.min.js"></script>
-<script src="../../Scripts/layout.js"></script>
-<script src="../../Scripts/storage.js"></script>
-@RenderSection("scripts", required: false)
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/storage")
+    @Scripts.Render("~/bundles/layout")
+    @RenderSection("scripts", required: false)
 </body>
 </html>

@@ -20,14 +20,16 @@ namespace Library.Web.Controllers
         private readonly IBookService bookService;
         private readonly IReserveService reserveService;
         private readonly IAuthorService authorService;
+        private readonly IBookIdService bookIdService;
         private ApplicationUserManager _userManager;
 
         public BooksController(IBookService bookService,
-            IReserveService reserveService, IAuthorService authorService )
+            IReserveService reserveService, IAuthorService authorService,IBookIdService bookIdService)
         {
             this.bookService = bookService;
             this.reserveService = reserveService;
             this.authorService = authorService;
+            this.bookIdService = bookIdService;
         }
         public ApplicationUserManager UserManager
         {
@@ -40,49 +42,71 @@ namespace Library.Web.Controllers
                 _userManager = value;
             }
         }
+
+        /// <summary>
+        /// Bütün kitapları getirir.
+        /// </summary>
+        /// <returns></returns>
         // GET: api/Books
         [AllowAnonymous]
-        public IEnumerable<BookViewModel> Get()
+        public HttpResponseMessage Get()
         {
             var booksList = bookService.GetBooks();
             var viewModel = new List<BookViewModel>();
             foreach (var model in booksList)
             {
                 var view = Mapper.Map<Books,BookViewModel>(model);
-                view.Reserves = Mapper.Map<List<Reserve>, List<ReserveBookViewModel>>(model.Reserve.ToList());
                 viewModel.Add(view);
             }
-            return viewModel;
+            if (viewModel.Count > 0)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, viewModel);
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.NoContent, viewModel);
+            }
         }
 
-        // GET: api/Books?isbn={isbn}
-       [Route("{isbn}")]
+        /// <summary>
+        /// Isbn ile istenen kitabın kopyalarına ait listeyi getirir.
+        /// </summary>
+        /// <param name="isbn"></param>
+        /// <returns></returns>
+        [Route("{isbn}")]
         public HttpResponseMessage Get(string isbn)
         {
-            var book = bookService.GetBook(isbn);
-            if (book != null)
+            if (String.IsNullOrEmpty(isbn))
             {
-                var view = Mapper.Map<Books, BookViewModel>(book);
-                view.Reserves = Mapper.Map<List<Reserve>, List<ReserveBookViewModel>>(book.Reserve.ToList());
-                foreach (var temp in view.Reserves)
-                {
-                    if (temp.UserReturnedDate == null && DateTime.Compare(DateTime.Now, temp.ReturnDate) <=0)
-                    {
-                        temp.ReserveState = ReserveState.Reserved;
-                    }
-                    else if (temp.UserReturnedDate == null && DateTime.Compare(DateTime.Now, temp.ReturnDate)>0)
-                    {
-                        temp.ReserveState = ReserveState.NotReturned;
-                    }
-                    else
-                    {
-                        temp.ReserveState = ReserveState.Returned;
-                    }
-                }
-                return Request.CreateResponse(HttpStatusCode.Accepted,view);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new {message = "Hatalı istek"});
             }
-            return Request.CreateResponse(HttpStatusCode.NotFound);
+
+            var book = bookService.GetBook(isbn);
+            if (book == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound, "Kitap bulunamadı");
+            }
+            var bookViewModel = Mapper.Map<Books, BookViewModel>(book);
+            var allBookCopies= bookIdService.GetBookIdsByIsbn(isbn);
+            var bookIdsViewModel = Mapper.Map<List<BookIds>,List<BookIdsViewModel>>(allBookCopies.ToList());
+            
+            bookViewModel.BookIds = bookIdsViewModel;
+            if (bookViewModel.Count > 0)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, bookViewModel);
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.NoContent, bookViewModel);
+            }
         }
+     
+        /// <summary>
+        /// Veritabanına kitap ekler.
+        /// Sadece Admin yetkisi ile kullanılabilir.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         // POST: api/Books
         [Authorize(Roles = "Admin")]
         public HttpResponseMessage Post(CreateBookViewModel value)
@@ -91,6 +115,13 @@ namespace Library.Web.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
+
+            var bookIsInDb = bookService.GetBook(value.Isbn)!=null;
+            if (bookIsInDb)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "Isbn daha önce eklenmiş");
+            }
+            
             List<Authors> authorList = new List<Authors>();
             var book = Mapper.Map<CreateBookViewModel, Books>(value);
             foreach (var author in value.Author)
@@ -106,6 +137,7 @@ namespace Library.Web.Controllers
             }
             book.Authors = authorList;
             bookService.AddBook(book);
+            bookIdService.GenerateBookIdsForBook(book);
             try
             {
                 bookService.SaveChanges();
@@ -118,14 +150,24 @@ namespace Library.Web.Controllers
             }
         }
 
+        /// <summary>
+        /// Kitabı günceller.
+        /// Sadece Admin yetkisi ile kullanılabilir.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         // PUT: api/Books?={isbn}
         [Authorize(Roles = "Admin")]
-        [Route("{isbn}")]
-        public HttpResponseMessage Put(string isbn, CreateBookViewModel value)
+        public HttpResponseMessage Put(CreateBookViewModel value)
         {
             if (!ModelState.IsValid)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
+            }
+            var bookIsInDb = bookService.GetBook(value.Isbn) == null;
+            if (bookIsInDb)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound, "Kitap bulunamadı");
             }
             List<Authors> authorList = new List<Authors>();
             var book = Mapper.Map<CreateBookViewModel, Books>(value);
@@ -154,6 +196,12 @@ namespace Library.Web.Controllers
 
         }
 
+        /// <summary>
+        /// Veritabanından kitabı siler.
+        /// Sadece Admin yetkisi ile kullanılabilir.
+        /// </summary>
+        /// <param name="isbn"></param>
+        /// <returns></returns>
         // DELETE: api/Books?isbn={isbn}
         [Authorize(Roles = "Admin")]
         [Route("{isbn}")]
@@ -170,21 +218,149 @@ namespace Library.Web.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
             }
         }
+        /// <summary>
+        /// Kullanıcının yaptığı tüm kiralamaları getirir.
+        /// </summary>
+        /// <returns></returns>
+        // GET api/books/reserve
+        [Route("Reserve")]
+        public HttpResponseMessage GetReserve()
+        {
+            var reserves = reserveService.GetAllReservesByUserId(User.Identity.GetUserId());
+            var viewModel = Mapper.Map<IEnumerable<Reserve>, IEnumerable<ReserveViewModel>>(reserves);
+            foreach (var reserve in viewModel)
+            {
+                var book = bookService.GetBook(reserve.Isbn);
+                var authors = Mapper.Map<List<Authors>, List<AuthorViewModel>>(book.Authors.ToList());
+                reserve.Authors = authors;
+                if (reserve.UserReturnedDate == null && DateTime.Compare(DateTime.Now, reserve.ReturnDate) <= 0)
+                {
+                    reserve.ReserveState = BookStatus.Reserved;
+                }
+                else if (reserve.UserReturnedDate == null && DateTime.Compare(DateTime.Now, reserve.ReturnDate) > 0)
+                {
+                    reserve.ReserveState = BookStatus.Reserved;
+                }
+                else
+                {
+                    reserve.ReserveState = BookStatus.Available;
+                }
+            }
 
-        // POST api/books/reserve?isbn={isbn}
+            if (viewModel.Any())
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, viewModel);
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.NoContent, viewModel);
+            }
+        }
+        /// <summary>
+        /// İstenen kitabın kiralama geçmişini getirir.
+        /// 
+        /// </summary>
+        /// <param name="isbn"></param>
+        /// <param name="bookId"></param>
+        /// <returns></returns>
+        [Route("Reserve/{isbn}")]
+        public HttpResponseMessage GetReserve(string isbn)
+        {
+            isbn = isbn.Trim();
+            var book = bookService.GetBook(isbn);
+            if (book == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound, new { message = "Kitap bulunamadı." });
+            }
+
+            var viewModel = Mapper.Map<Books, BookViewModel>(book);
+            //var reservesForThisBook = reserveService.GetBooksReserveHistory(isbn);
+            //var reservesViewModel = Mapper.Map<IEnumerable<Reserve>, IEnumerable<ReserveBookViewModel>>(reservesForThisBook);
+            //viewModel.Reserves = reservesViewModel.ToList();
+            var bookIds = bookIdService.GetBookIdsByIsbn(isbn);
+            var bookIdViewModel = Mapper.Map<IEnumerable<BookIds>, IEnumerable<BookIdsViewModel>>(bookIds).ToList();
+            foreach (var bookId in bookIdViewModel)
+            {
+                var booksReserveHistory = reserveService.GetBooksCopyReserveHistory(bookId.BookId);
+                bookId.Reserves = Mapper.Map<List<Reserve>, List<ReserveViewModel>>(booksReserveHistory.ToList());
+            }
+
+            viewModel.BookIds = bookIdViewModel;
+            if (viewModel.Count > 0)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, viewModel);
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.NoContent, viewModel);
+            }
+        }
+        /// <summary>
+        /// İstenen kitabın kopyasının kiralama geçmişini getirir.
+        /// 
+        /// </summary>
+        /// <param name="isbn"></param>
+        /// <param name="bookId"></param>
+        /// <returns></returns>
+        [Route("Reserve/{isbn}/{bookId}")]
+        public HttpResponseMessage GetReserve(string isbn, string bookId)
+        {
+            if (String.IsNullOrEmpty(isbn) || String.IsNullOrEmpty(bookId))
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new { message = "Hatalı istek" });
+            }
+
+            isbn = isbn.Trim();
+            bookId = bookId.Trim();
+            var book = bookService.GetBook(isbn);
+            if (book == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound, new { message = "Kitap bulunamadı." });
+            }
+            var booksReserveHistory = reserveService.GetBooksCopyReserveHistory(bookId);
+            var viewModel = Mapper.Map<List<Reserve>, List<ReserveViewModel>>(booksReserveHistory.ToList());
+            if (viewModel.Count > 0)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, viewModel);
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.NoContent, viewModel);
+            }
+        }
+
+        /// <summary>
+        /// Kullanıcının kiralağığı kitap sayısı 3'ten az ise istenen kitabın kiralamaya uygun olan rastgele bir kopyasını kiralar.
+        /// </summary>
+        /// <param name="isbn"></param>
+        /// <returns></returns>
+        // POST api/books/reserve/{isbn}
         [Route("Reserve/{isbn}")]
         public HttpResponseMessage PostReserve(string isbn)
         {
+            if (String.IsNullOrEmpty(isbn))
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new { message = "Hatalı istek" });
+            }
+
+            isbn = isbn.Trim();
             var book = bookService.GetBook(isbn);
-            if(book == null)
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+            var bookIds = bookIdService.GetBookIdForReserve(isbn);
+            
+            if(book == null || bookIds == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound, new { message = "Bu kitaptan kütüphanede bulunamadı." });
+            }
             if (book.BookCount == 0)
-                return Request.CreateResponse(HttpStatusCode.BadRequest, new { message = "Bu kitaptan kütüphanede kalmamıştır."});
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                    new {message = "Bu kitaptan kütüphanede kalmamıştır."});
+            }
             var userId = User.Identity.GetUserId();
             // Kullanıcı kaç tane kiralık kitaba sahip.
             var reservedBooks = reserveService.GetBooksUserStillHave(userId);
             //Aynı kitabı iki kere vermeyelim
-            var userReservedThisBook = reservedBooks.Any(e => e.Isbn == isbn);
+            var userReservedThisBook = reservedBooks.Any(e => e.BookIds.Isbn == isbn);
             if (userReservedThisBook)
             {
                 return Request.CreateResponse(HttpStatusCode.Forbidden,new {message = "Bu kitap elinizde olduğu için tekrar kiralayamazsınız!"});
@@ -192,7 +368,9 @@ namespace Library.Web.Controllers
 
             if (reservedBooks.Count() < 3)
             {
-                var reserve = Factory.GetReserveInstace(userId,book);
+                bookIds.BookStatus = BookStatus.Reserved;
+                bookIdService.UpdateBookId(bookIds);
+                var reserve = Factory.GetReserveInstace(userId,bookIds);
                 reserveService.AddReserve((Reserve)reserve);
                 book.BookCount = book.BookCount - 1;
                 bookService.UpdateBook(book);
@@ -219,53 +397,38 @@ namespace Library.Web.Controllers
             }
             return Request.CreateResponse(HttpStatusCode.Forbidden, new { message = "Aynı anda sadece 3 kitap kiralayabilirsiniz!" });
         }
-        // GET api/books/reserve
-        [Route("Reserve")]
-        public IEnumerable<ReserveViewModel> GetReserve()
-        {
-            var reserves = reserveService.GetAllReservesByUserId(User.Identity.GetUserId());
-            var reserveList =Mapper.Map<IEnumerable<Reserve>, IEnumerable<ReserveViewModel>>(reserves);
-            foreach (var reserve in reserveList)
-            {
-                var book = bookService.GetBook(reserve.Isbn);
-                var authors = Mapper.Map<List<Authors>, List<AuthorViewModel>>(book.Authors.ToList());
-                reserve.Authors = authors;
-                if (reserve.UserReturnedDate == null && DateTime.Compare(DateTime.Now, reserve.ReturnDate) <= 0)
-                {
-                    reserve.ReserveState = ReserveState.Reserved;
-                }
-                else if (reserve.UserReturnedDate == null && DateTime.Compare(DateTime.Now, reserve.ReturnDate) > 0)
-                {
-                    reserve.ReserveState = ReserveState.NotReturned;
-                }
-                else
-                {
-                    reserve.ReserveState = ReserveState.Returned;
-                }
-            }
 
-            return reserveList;
-        }
-        // PUT api/books/reserve?isbn={isbn}
+        /// <summary>
+        /// Daha önce kiralanmış kitabı iade eder.
+        /// </summary>
+        /// <param name="reserveId"></param>
+        /// <returns></returns>
+        // PUT api/books/reserve/{reserveId}
         [Route("Reserve/{reserveId}")]
         public HttpResponseMessage PutReserve(int reserveId)
         {
             var reserve = reserveService.GetReserve(reserveId);
             if (reserve == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                return Request.CreateResponse(HttpStatusCode.NotFound, new { message = "Kiralama bulunamadı!" });
             }
+            //Başkasının kitabını güncellemesini engeller.
             var reserveObj = reserveService.GetBooksUserStillHave(User.Identity.GetUserId()).FirstOrDefault(e=>e.ReserveId==reserveId);
             if (reserveObj == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                return Request.CreateResponse(HttpStatusCode.NotFound, new { message = "Kiralama bulunamadı!" });
             }
 
-            var book = reserveObj.Books;
+            var bookId = reserveObj.BookIds;
+            bookId.BookStatus = BookStatus.Available;
+            bookIdService.UpdateBookId(bookId);
+
+            var book = reserveObj.BookIds.Book;
             book.BookCount = book.BookCount + 1;
             bookService.UpdateBook(book);
             reserveObj.UserReturnedDate=DateTime.Now;
             reserveService.UpdateReserve(reserveObj);
+
             try
             {
                 reserveService.SaveChanges();

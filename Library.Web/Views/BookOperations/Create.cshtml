@@ -28,7 +28,18 @@
     </div>
 </form>
 
-
+@section scripts{
+    <script>
+        $(document).ready(function()
+        {
+            $("#admin").removeClass("active");
+            $("#main-page").removeClass("active");
+            $("#my-books").removeClass("active");
+            $("#api-help").removeClass("active");
+            $("#admin").addClass("active");
+        });
+    </script>
+}
 
 
 

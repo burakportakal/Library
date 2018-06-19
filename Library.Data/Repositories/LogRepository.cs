@@ -14,12 +14,12 @@ namespace Library.Data
         {
         }
 
-        public Log GetById(int id)
+        public override Log GetById(int id)
         {
            return DbContext.Log.Find(id);
         }
 
-        public void Delete(Log log)
+        public override void Delete(Log log)
         {
             DbContext.Log.Remove(log);
         }

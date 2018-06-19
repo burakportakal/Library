@@ -10,6 +10,6 @@ namespace Library.Model
         string BookTitle { get; set; }
         string Isbn { get; set; }
         string PublishYear { get; set; }
-        ICollection<Reserve> Reserve { get; set; }
+        ICollection<BookIds> BookIds { get; set; }
     }
 }

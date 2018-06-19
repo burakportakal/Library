@@ -76,7 +76,10 @@ function reserve(data) {
         url: "/api/books/reserve/"+isbn,
         headers: headers,
         success: function (data) {
-            alert("Kiralama başarılı");
+           if(alert("Kiralama başarılı"));
+            {
+                location.reload();
+            }
         },
         statusCode:{
             403: function(data) {

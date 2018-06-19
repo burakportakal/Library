@@ -10,7 +10,7 @@ $(function () {
            e.preventDefault();
            $.ajax({
                type: "POST",
-               url: "api/account/logout",
+               url: "/api/account/logout",
                headers:headers,
                success: function () {
                    sessionStorage.clear();
@@ -170,11 +170,64 @@ function loadReserveData(isbn) {
         url: "/api/books/" + isbn,
         headers: headers,
         success: function (data) {
-            createReserveTable(data);
+            createIdTable(data,isbn);
         }
     });
 }
+function loadBookReserveData(isbn,bookId) {
+    $.ajax({
+        type: "GET",
+        url: "/api/books/reserve/" +isbn+"/"+ bookId,
+        headers: headers,
+        success: function (data) {
+            createBookReserveTable(data);
+        }
+    });
+}
+function createIdTable(data,isbn) {
+    var x = "<tbody id='bookValues'>";
 
+    for (var i = 0; i < data.BookIds.length; i++) {
+        x += "<tr>";
+        x += "<th><a href='/bookoperations/bookindex/" + isbn + "?bookid=" + data.BookIds[i].BookId + "'>" + data.BookIds[i].BookId + "</a></th>";
+        x += "<th>" + data.BookIds[i].Status + "</th>";
+        x += "</tr>";
+    }
+    x += "</tbody>";
+    $("#bookIds").append(x);
+}
+function createBookReserveTable(data) {
+
+    var x = "<tbody id='bookValues'>";
+
+    for (var i = 0; i < data.length; i++) {
+        if (data[i].ReserveState == 1) {
+            x += "<tr class=\"table-success\">";
+        } else {
+            x += "<tr class='table-primary'>";
+        }
+        x += "<th>" + data[i].ReserveId + "</th>";
+        x += "<th>" + data[i].UserId + "</th>";
+        var date = new Date(data[i].ReserveDate);
+        x += "<th>" + date.format("dd.mm.yyyy") + "</th>";
+        date = new Date(data[i].ReturnDate);
+        x += "<th>" + date.format("dd.mm.yyyy") + "</th>";
+        if (data[i].UserReturnedDate != null) {
+            date = new Date(data[i].UserReturnedDate);
+            x += "<th>" + date.format("dd.mm.yyyy") + "</th>";
+        } else {
+            x += "<th></th>";
+        }
+        if (data[i].ReserveState == 0) {
+            x += "<th>Reserved</th>";
+        } else {
+            x += "<th>Returned</th>";
+        }
+        x += "</tr>";
+    }
+    x += "</tbody>";
+    $("#bookIdReserve").append(x);
+}
 function createReserveTable(data) {
     var x = "<tbody id='bookValues'>";
     var reservedCount = 0;
@@ -228,7 +281,7 @@ function updateBook(url){
     };
     $.ajax({
         type: "PUT",
-        url: "/api/books/"+url,
+        url: "/api/books/",
         data: postData,
         headers: headers,
 

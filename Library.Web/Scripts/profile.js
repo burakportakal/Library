@@ -60,7 +60,10 @@ function returnBook(obj) {
         url: "/api/books/reserve/"+reserveId,
         headers: headers,
         success: function (data) {
-            alert("iade başarılı");
+            if(alert("iade başarılı"));
+            {
+                location.reload();
+            }
         },
         statusCode: {
             400: function (data) {

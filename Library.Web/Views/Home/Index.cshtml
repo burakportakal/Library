@@ -15,11 +15,6 @@
         </thead>
     </table>
 </div>
-<div class="row justify-content-end">
-    <div class="col-4" style="margin-right: 18px;">
-        <button type="button" onclick="redirect()" style="float: right;" class="btn btn-primary mb-2">Yeni Kitap Ekle</button>
-    </div>
-</div>
 
 
 
@@ -28,7 +23,7 @@
 
 
 @section Scripts{
-    <script src="../../Scripts/index.js"></script>
+    @Scripts.Render("~/bundles/index")
     <script>
         $(document).ready(function () {
             var authenticated = "@User.Identity.IsAuthenticated";
@@ -37,7 +32,11 @@
             } else {
                 loadData();
             }
-
+            $("#admin").removeClass("active");
+            $("#main-page").removeClass("active");
+            $("#my-books").removeClass("active");
+            $("#api-help").removeClass("active");
+            $("#main-page").addClass("active");
         });
     </script>
 }

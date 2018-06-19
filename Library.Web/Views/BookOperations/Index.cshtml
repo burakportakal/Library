@@ -29,7 +29,12 @@
 
 @section Scripts{
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
+            $("#admin").removeClass("active");
+            $("#main-page").removeClass("active");
+            $("#my-books").removeClass("active");
+            $("#api-help").removeClass("active");
+            $("#admin").addClass("active");
             loadData();
         });
 

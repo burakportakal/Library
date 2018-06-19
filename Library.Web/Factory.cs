@@ -19,15 +19,14 @@ namespace Library.Web
             return new Authors();
         }
 
-        public static IReserve GetReserveInstace(string userId, Books book)
+        public static IReserve GetReserveInstace(string userId, BookIds book)
         {
             return new Reserve
             {
                 UserId = userId,
-                Books = book
+                BookIds = book
             };
         }
-
         public static IApplicationUser GetApplicationUserInstance()
         {
             return new ApplicationUser();

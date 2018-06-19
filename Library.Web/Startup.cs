@@ -27,15 +27,17 @@ namespace Library.Web
                     .ForMember(returnDate => returnDate.ReturnDate,
                         settings => settings.MapFrom(reserve => reserve.CalculatedReturnDate))
                     .ForMember(isbn => isbn.Isbn,
-                        settings => settings.MapFrom(reserve => reserve.Isbn))
+                        settings => settings.MapFrom(reserve => reserve.BookIds.Isbn))
                     .ForMember(userId => userId.UserId,
                         settings => settings.MapFrom(reserve => reserve.UserId))
                     .ForMember(userReturnedDate => userReturnedDate.UserReturnedDate,
                         settings => settings.MapFrom(reserve => reserve.UserReturnedDate))
                     .ForMember(bookTitle => bookTitle.BookTitle,
-                        settings => settings.MapFrom(reserve => reserve.Books.BookTitle))
-                    .ForSourceMember(book => book.User, opt => opt.Ignore());
-                
+                        settings => settings.MapFrom(reserve => reserve.BookIds.Book.BookTitle))
+                    .ForMember(state => state.ReserveState,opt => opt.ResolveUsing(ReserveResolver))
+                    .ForSourceMember(book => book.User, opt => opt.Ignore())
+                    .ForSourceMember(book => book.BookIds, opt => opt.Ignore());
+
 
                 e.CreateMap<CreateBookViewModel, Books>()
                     .ForMember(dest => dest.Isbn, source =>
@@ -46,51 +48,22 @@ namespace Library.Web
                         source.MapFrom(book => book.PublishYear))
                     .ForMember(dest => dest.BookCount, source =>
                         source.MapFrom(book => book.Count))
-                    .ForMember(dest => dest.Reserve, opt => opt.Ignore())
                     .ForMember(dest => dest.Authors, opt => opt.Ignore());
-
-
-
-                //e.CreateMap<Books, BookViewModel>()
-                //    .ForMember(dest => dest.Authors, source =>
-                //        source.MapFrom(authors =>
-                //            e.CreateMap<Authors, AuthorViewModel>()
-                //                .ForMember(destAuthor => destAuthor.AuthorName,
-                //                    sourceAuthor => sourceAuthor.MapFrom(s => s.AuthorName))
-                //                .ForSourceMember(author => author.Books, opt => opt.Ignore())
-                //                .ForSourceMember(author => author.AuthorsId, opt => opt.Ignore())
-                //        )).ForMember(dest => dest.Reserves, source =>
-                //           e.CreateMap<Reserve, ReserveBookViewModel>()
-                //               .ForMember(reserveViewModel => reserveViewModel.UserId,
-                //                   destReserve => destReserve.MapFrom(reserve => reserve.UserId))
-                //               .ForMember(reserveViewModel => reserveViewModel.ReserveDate,
-                //                   destReserve => destReserve.MapFrom(reserve => reserve.DateReserved))
-                //               .ForMember(reserveViewModel => reserveViewModel.ReserveId,
-                //                   destReserve => destReserve.MapFrom(reserve => reserve.ReserveId))
-                //               .ForMember(reserveViewModel => reserveViewModel.ReturnDate,
-                //                   destReserve => destReserve.MapFrom(reserve => reserve.CalculatedReturnDate))
-                //               .ForMember(reserveViewModel => reserveViewModel.UserReturnedDate,
-                //                   destReserve => destReserve.MapFrom(reserve => reserve.UserReturnedDate))
-                //               .ForSourceMember(reserve => reserve.Books, opt => opt.Ignore())
-                //               .ForSourceMember(reserve => reserve.User, opt => opt.Ignore()))
-                //    .ForMember(dest => dest.BookTitle, source => source.MapFrom(title => title.BookTitle))
-                //    .ForMember(dest => dest.Count, source => source.MapFrom(title => title.BookCount))
-                //    .ForMember(dest => dest.Isbn, source => source.MapFrom(title => title.Isbn))
-                //    .ForMember(dest => dest.PublishYear, source => source.MapFrom(title => title.PublishYear));
 
                 e.CreateMap<Books, BookViewModel>()
                     .ForMember(dest => dest.BookTitle, source => source.MapFrom(title => title.BookTitle))
                     .ForMember(dest => dest.Count, source => source.MapFrom(title => title.BookCount))
                     .ForMember(dest => dest.Isbn, source => source.MapFrom(title => title.Isbn))
                     .ForMember(dest => dest.PublishYear, source => source.MapFrom(title => title.PublishYear))
-                    
-                    .ForSourceMember(dest => dest.Reserve,opt=>opt.Ignore())
+                    .ForMember(dest => dest.BookIds,opt=> opt.Ignore())
                     .ForSourceMember(dest => dest.Authors, opt => opt.Ignore());
+
                 e.CreateMap<Authors, AuthorViewModel>()
                     .ForMember(destAuthor => destAuthor.AuthorName,
                         sourceAuthor => sourceAuthor.MapFrom(s => s.AuthorName))
                     .ForSourceMember(author => author.Books, opt => opt.Ignore())
                     .ForSourceMember(author => author.AuthorsId, opt => opt.Ignore());
+
                  e.CreateMap<Reserve, ReserveBookViewModel>()
                            .ForMember(reserveViewModel => reserveViewModel.UserName,
                                destReserve => destReserve.MapFrom(reserve => reserve.User.UserName))
@@ -103,11 +76,32 @@ namespace Library.Web
                            .ForMember(reserveViewModel => reserveViewModel.UserReturnedDate,
                                destReserve => destReserve.MapFrom(reserve => reserve.UserReturnedDate))
                            .ForMember(dest => dest.ReserveState, opt => opt.Ignore())
-                           .ForSourceMember(reserve => reserve.Books, opt => opt.Ignore())
+                           .ForSourceMember(reserve => reserve.BookIds, opt => opt.Ignore())
                            .ForSourceMember(reserve => reserve.User, opt => opt.Ignore());
+
+                e.CreateMap<BookIds, BookIdsViewModel>()
+                    .ForMember(dest => dest.BookId, source => source.MapFrom(data => data.BookId))
+                    .ForMember(dest => dest.Status, source => source.MapFrom(data => data.BookStatus))
+                    .ForMember(dest => dest.Reserves, opt=> opt.Ignore())
+                    .ForSourceMember(source => source.Isbn, opt => opt.Ignore())
+                    .ForSourceMember(source => source.Book, opt => opt.Ignore())
+                    .ForSourceMember(source => source.Reserves, opt => opt.Ignore())
+                    ;
             });
                 
             ConfigureAuth(app);
+        }
+
+        public static object ReserveResolver(Reserve reserve)
+        {
+            if (reserve.UserReturnedDate != null)
+            {
+                return BookStatus.Available;
+            }
+            else
+            {
+                return BookStatus.Reserved;
+            }
         }
     }
 }

@@ -22,6 +22,8 @@ namespace Library.Service
         /// <returns></returns>
         IEnumerable<Reserve> GetBooksUserStillHave(string userId);
 
+        IEnumerable<Reserve> GetBooksCopyReserveHistory(string bookId);
+        IEnumerable<Reserve> GetBooksReserveHistory(string isbn);
         void UpdateReserve(Reserve reserve);
         void AddReserve(Reserve reserve);
         void SaveChanges();
@@ -29,49 +31,59 @@ namespace Library.Service
     }
     public class ReserveService: IReserveService
     {
-        private readonly IReserveRepository reserveReposityory;
+        private readonly IReserveRepository reserveRepository;
         private readonly IUnitOfWork unitOfWork;
 
         public ReserveService(IReserveRepository reserveReposityory, IUnitOfWork unitOfWork)
         {
-            this.reserveReposityory = reserveReposityory;
+            this.reserveRepository = reserveReposityory;
             this.unitOfWork = unitOfWork;
         }
         public IEnumerable<Reserve> GetReserves()
         {
-            return reserveReposityory.GetAll();
+            return reserveRepository.GetAll();
         }
 
         public Reserve GetReserve(int id)
         {
-            return reserveReposityory.GetById(id);
+            return reserveRepository.GetById(id);
         }
 
         public Reserve GetReserveByUserId(string isbn ,string userId)
         {
-            return reserveReposityory.GetAll().FirstOrDefault(i => (i.Isbn == isbn && i.UserId == userId));
+            return reserveRepository.GetAll().FirstOrDefault(i => (i.BookIds.Isbn == isbn && i.UserId == userId));
         }
 
         public IEnumerable<Reserve> GetAllReservesByUserId(string userId)
         {
-            return reserveReposityory.GetUsersAllReservesByUserId(userId);
+            return reserveRepository.GetUsersAllReservesByUserId(userId);
         }
 
         public IEnumerable<Reserve> GetBooksUserStillHave(string userId)
         {
-            return reserveReposityory.GetUsersNotReturnedBooksByUserId(userId);
+            return reserveRepository.GetUsersNotReturnedBooksByUserId(userId);
+        }
+
+        public IEnumerable<Reserve> GetBooksCopyReserveHistory(string bookId)
+        {
+            return reserveRepository.GetBooksCopyReserveHistory(bookId);
+        }
+
+        public IEnumerable<Reserve> GetBooksReserveHistory(string isbn)
+        {
+            return reserveRepository.GetBooksAllReserves(isbn);
         }
 
         public void UpdateReserve(Reserve reserve)
         {
-            reserveReposityory.Update(reserve);
+            reserveRepository.Update(reserve);
         }
         public void AddReserve(Reserve reserve)
         {
-            var isUserHasPesmission = reserveReposityory.GetUsersNotReturnedBooksByUserId(reserve.UserId).Count <= 3;
+            var isUserHasPesmission = reserveRepository.GetUsersNotReturnedBooksByUserId(reserve.UserId).Count() <= 3;
             if (isUserHasPesmission)
             {
-                reserveReposityory.Add(reserve);
+                reserveRepository.Add(reserve);
             }
             else
             {

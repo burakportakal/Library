@@ -18,19 +18,18 @@ namespace Library.Data
         {
             return DbContext.Books
                 .Include(e => e.Authors)
-                .Include(e => e.Reserve)
                 .FirstOrDefault(i => i.Isbn == isbn);
         }
 
         public override IEnumerable<Books> GetAll()
         {
-           
-            return DbContext.Books.Include(e => e.Authors).Include(e => e.Reserve);
+
+            return DbContext.Books.Include(e => e.Authors);
         }
 
         public void Delete(string isbn)
         {
-            var book = DbContext.Books.Find(isbn);
+            var book = DbContext.Books.Include(e=> e.Authors).Include(e=> e.BookIds).FirstOrDefault(e=> e.Isbn==isbn);
             DbContext.Books.Remove(book);
         }
     }

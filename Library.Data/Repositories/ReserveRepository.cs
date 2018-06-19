@@ -11,24 +11,37 @@ namespace Library.Data
     public class ReserveRepository :RepositoryBase<Reserve>, IReserveRepository
     {
         public ReserveRepository(IDbFactory dbFactory) : base(dbFactory) { }
-        public List<Reserve> GetUsersAllReservesByUserId(string userId)
+        public IEnumerable<Reserve> GetUsersAllReservesByUserId(string userId)
         {
-            return DbContext.Reserve.Where(r => r.UserId == userId).ToList();
+            return DbContext.Reserve.Where(r => r.UserId == userId);
         }
 
-        public List<Reserve> GetUsersNotReturnedBooksByUserId(string userId)
+        public IEnumerable<Reserve> GetUsersNotReturnedBooksByUserId(string userId)
         {
             var reservedBooks = DbContext.Reserve
                 .Where(r => r.UserId == userId)
-                .Where(d => d.UserReturnedDate == null).ToList();
+                .Where(d => d.UserReturnedDate == null);
             return reservedBooks;
+        }
+
+        public IEnumerable<Reserve> GetBooksCopyReserveHistory(string bookId)
+        {
+            var reserveHistoryForBook = DbContext.Reserve.Where(e => e.BookId == bookId);
+            return reserveHistoryForBook;
+        }
+
+        public IEnumerable<Reserve> GetBooksAllReserves(string isbn)
+        {
+            return DbContext.Reserve.Where(e => e.BookIds.Isbn == isbn);
         }
     }
 
     public interface IReserveRepository : IRepository<Reserve>
     {
-        List<Reserve> GetUsersAllReservesByUserId(string userId);
-        List<Reserve> GetUsersNotReturnedBooksByUserId(string userId);
+        IEnumerable<Reserve> GetUsersAllReservesByUserId(string userId);
+        IEnumerable<Reserve> GetUsersNotReturnedBooksByUserId(string userId);
+        IEnumerable<Reserve> GetBooksCopyReserveHistory(string bookId);
+        IEnumerable<Reserve> GetBooksAllReserves(string isbn);
     }
 
 }

@@ -17,6 +17,7 @@ namespace Library.Data
         public DbSet<Books> Books { get; set; }
         public DbSet<Reserve> Reserve { get; set; }
         public DbSet<Log> Log { get; set; }
+        public DbSet<BookIds> BookIds { get; set; }
 
         public virtual void Commit()
         {
@@ -26,6 +27,7 @@ namespace Library.Data
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Books>().HasKey(e => e.Isbn);
+            modelBuilder.Entity<BookIds>().HasKey(e => e.BookId);
             base.OnModelCreating(modelBuilder);
         }
         public static LibraryEntities Create()

@@ -47,7 +47,12 @@ namespace Library.Web.App_Start
             builder.RegisterType<BooksRepository>()
                 .As<IBooksRepository>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<LogRepository>().As<ILogRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<LogRepository>()
+                .As<ILogRepository>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<BookIdRepository>()
+                .As<IBookIdRepository>()
+                .InstancePerLifetimeScope();
 
             builder.RegisterType<AuthorService>()
                 .As<IAuthorService>()
@@ -58,7 +63,12 @@ namespace Library.Web.App_Start
             builder.RegisterType<ReserveService>()
                 .As<IReserveService>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<LogService>().As<ILogService>().InstancePerLifetimeScope();
+            builder.RegisterType<LogService>()
+                .As<ILogService>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<BookIdService>()
+                .As<IBookIdService>()
+                .InstancePerLifetimeScope();
 
             
             //Set the dependency resolver to be Autofac.  

@@ -11,8 +11,8 @@ namespace Library.Model
         public string Isbn { get; set; }
         public string BookTitle { get; set; }
         public string PublishYear { get; set; }
+        public ICollection<BookIds> BookIds { get; set; }
         public int BookCount { get; set; }
         public ICollection<Authors> Authors { get; set; }
-        public ICollection<Reserve> Reserve { get; set; }
     }
 }

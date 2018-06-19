@@ -22,6 +22,8 @@ namespace Library.Web.Logger
             var logService = GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(ILogService)) as ILogService;
             var context = request.GetOwinContext().Authentication;
             var response = await base.SendAsync(request, cancellationToken);
+            if (response == null)
+                return null;
             var isAuthenticated = context.User.Identity.IsAuthenticated;
             var userName = context.User.Identity.Name;
             //await OutgoingMessageAsync(corrId, requestInfo, responseMessage);

@@ -1,6 +1,8 @@
 ﻿$(function() {
     $("#registerForm").submit(function (e) {
+        removeErrors();
         e.preventDefault();
+        
         var self = $(this);
         var url = self.attr("action");
         var data = self.serialize();
@@ -18,7 +20,7 @@
                     alert("Username already exist");
                     removeErrors();
                 },
-                400: function () {
+                400: function (error) {
                     $.each(error.responseJSON.ModelState, function (error, errorText) {
                         switch (error) {
                             case "model.Email":
@@ -29,6 +31,9 @@
                                 break;
                             case "model.ConfirmPassword":
                                 showError($("#confirmPasswordError"), errorText[0]);
+                                break;
+                            default:
+                                alert(errorText);
                                 break;
                         }
                     });
