@@ -1,0 +1,66 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div id="table" class="container">
+    <div class="alert alert-light" id="bookCount" role="alert">
+      
+    </div>
+    <table id="bookIds" class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Kitap Id</th>
+            <th>Durumu</th>
+        </tr>
+        </thead>
+    </table>
+    <table id="bookIdReserve" class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Kira Id</th>
+            <th>Kullanıcı Id</th>
+            <th>Kiralama Tarihi</th>
+            <th>Beklenen Geri Dönüş Tarihi</th>
+            <th>Geri Dönüş Tarihi</th>
+            <th>Durum</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+
+
+
+
+
+@section Scripts{
+    @Scripts.Render("~/bundles/date")
+    <script>
+        $(document).ready(function() {
+            var isbn = "@Request.Url.AbsolutePath";
+            var bookid = "@Request.Params["bookid"]";
+            isbn = isbn.split("/");
+            if (isbn.length == 4 && bookid == "") {
+                isbn = isbn[3];
+                loadReserveData(isbn);
+                $("#bookIdReserve").remove();
+            } else if (isbn.length == 4 && bookid !="") {
+                isbn = isbn[3];
+                var bookId = bookid;
+                $("#bookIds").remove();
+                loadBookReserveData(isbn,bookId);
+            } else {
+                return null;
+            }
+            $("#admin").removeClass("active");
+            $("#main-page").removeClass("active");
+            $("#my-books").removeClass("active");
+            $("#api-help").removeClass("active");
+            $("#admin").addClass("active");
+        });
+
+        function redirect() {
+            window.location.href = "/bookoperations/create";
+        }
+    </script>
+}

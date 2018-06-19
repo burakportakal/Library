@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+</head>
+
+<body>
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="/">Library</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <ul class="navbar-nav mr-auto">
+                    <li id="main-page" class="nav-item active">
+                        <a class="nav-link" href="/">Ana Sayfa <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li id="admin" class="nav-item">
+                        <a class="nav-link" href="/bookoperations">Admin</a>
+                    </li>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li id="my-books" class="nav-item">
+                        <a class="nav-link" href="/home/profile">Kitaplarım</a>
+                    </li>
+                }
+                    <li id="api-help" class="nav-item">
+                        <a class="nav-link" href="/help">API Help</a>
+                    </li>
+                </ul>
+                <ul class="nav justify-content-end">
+                    @if (!User.Identity.IsAuthenticated)
+                    { 
+                        <li class="nav-item">
+                            <a class="nav-link" style="color: #f8f8f8" href="/home/login?returnUrl=@Request.Url.AbsolutePath">Giriş</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" style="color: #f8f8f8" href="/home/register">Kayıt Ol</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item"><a style="color: #f8f8f8" class="nav-link" href="/profile">@User.Identity.Name</a></li>
+                        <li>
+                            <button class="btn btn-outline-info my-2 my-sm-0" id="logout">Çıkış</button>
+                        </li>
+                    }
+                </ul>
+
+            </div>
+        </nav>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Library Application</p>
+    </footer>
+</div>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/storage")
+    @Scripts.Render("~/bundles/layout")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

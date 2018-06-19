@@ -1,0 +1,46 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet prefetch" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css">
+    <link rel="stylesheet" href="../../Content/LoginRegister.css" />
+    <title></title>
+</head>
+<body>
+    <div>
+        <div class="container white z-depth-2">
+            <ul class="tabs teal">
+                <li class="tab col s3"><a id="loginLink" class="white-text active" href="#login">login</a></li>
+                <li class="tab col s3"><a id="registerLink" class="white-text" href="#register">register</a></li>
+            </ul>
+            <div id="login" class="col s12">
+                @Html.Action("LoginPartial", "Home")
+            </div>
+            <div id="register" class="col s12">
+                @Html.Action("RegisterPartial", "Home")
+            </div>
+        </div>
+
+    </div>
+    <script src='https://code.jquery.com/jquery-3.3.1.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js'></script>
+    <script src="../../Scripts/login-register.js"></script>
+    <script>
+    var willShown = "@ViewBag.show";
+    if (willShown == "Register") {
+        $("#login").css("display:none");
+        $("#loginLink").removeClass("active");
+
+        $("#register").css("display:block");
+        $("#registerLink").addClass("active");
+    }
+ 
+    </script>
+</body>
+</html>

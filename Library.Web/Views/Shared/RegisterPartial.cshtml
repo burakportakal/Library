@@ -1,0 +1,33 @@
+﻿
+
+<form class="col s12" id="registerForm" method="post" action="/api/account/register">
+    <div class="form-container">
+        <h3 class="teal-text">Welcome</h3>
+    <div class="row">
+        <div class="input-field col s12">
+            <span class="passive-error" id="emailError"></span>
+            <div class="input-field col s12">
+                <input id="email" type="email" name="Email" class="validate">
+                <label for="email">Email</label>
+            </div>
+        </div>
+        <div class="row">
+            <span class="passive-error" id="passwordError"></span>
+            <div class="input-field col s12">
+                <input id="password" type="password" name="Password" class="validate">
+                <label for="password">Password</label>
+            </div>
+        </div>
+        <div class="row">
+            <span class="passive-error" id="confirmPasswordError"></span>
+            <div class="input-field col s12">
+                <input id="password-confirm" type="password" name="ConfirmPassword" class="validate">
+                <label for="password-confirm">Password Confirmation</label>
+            </div>
+        </div>
+        <center>
+            <button class="btn waves-effect waves-light teal" type="submit" name="action">Submit</button>
+        </center>
+    </div>
+    </div>
+</form>

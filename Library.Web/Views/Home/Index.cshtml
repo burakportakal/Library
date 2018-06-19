@@ -1,0 +1,42 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="table" class="container">
+    <table id="bookData" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Isbn</th>
+                <th>Kitap Adı</th>
+                <th>Yazar</th>
+                <th>Basım Tarihi</th>
+                <th>Adet</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+
+
+
+
+
+
+@section Scripts{
+    @Scripts.Render("~/bundles/index")
+    <script>
+        $(document).ready(function () {
+            var authenticated = "@User.Identity.IsAuthenticated";
+            if (authenticated.toLowerCase() =="true") {
+                loadAuthData();
+            } else {
+                loadData();
+            }
+            $("#admin").removeClass("active");
+            $("#main-page").removeClass("active");
+            $("#my-books").removeClass("active");
+            $("#api-help").removeClass("active");
+            $("#main-page").addClass("active");
+        });
+    </script>
+}

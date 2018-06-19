@@ -1,0 +1,45 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div id="table"class="container">
+    <table id="bookData" class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Isbn</th>
+            <th>Kitap Adı</th>
+            <th>Yazar</th>
+            <th>Basım Tarihi</th>
+            <th>Adet</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+<div class="row justify-content-end">
+    <div class="col-4" style="margin-right: 18px;">
+        <button type="button" onclick="redirect()" style="float: right;"class="btn btn-primary mb-2">Yeni Kitap Ekle</button>
+    </div>
+</div>
+
+
+
+
+
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $("#admin").removeClass("active");
+            $("#main-page").removeClass("active");
+            $("#my-books").removeClass("active");
+            $("#api-help").removeClass("active");
+            $("#admin").addClass("active");
+            loadData();
+        });
+
+        function redirect() {
+            window.location.href = "/bookoperations/create";
+        }
+    </script>
+}
