@@ -240,3 +240,5 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/Library.Web/Properties/PublishProfiles/libraryburak - FTP.pubxml
+/Library.Web/Properties/PublishProfiles/libraryburak - Web Deploy.pubxml

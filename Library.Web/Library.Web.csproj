@@ -43,6 +43,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Library.Web.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Autofac, Version=4.8.1.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
@@ -245,8 +246,10 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\Api\AccountController.cs" />
     <Compile Include="Controllers\Api\BooksController.cs" />
+    <Compile Include="Controllers\Api\LogController.cs" />
     <Compile Include="Controllers\BookOperationsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LogController.cs" />
     <Compile Include="Factory.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -290,6 +293,8 @@
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\CollectionModelDescription.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ApiGroup.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\Api.cshtml" />
+    <None Include="Properties\PublishProfiles\libraryburak - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\libraryburak - Web Deploy.pubxml" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\date.format.js" />
@@ -331,6 +336,7 @@
     <Content Include="Views\BookOperations\Edit.cshtml" />
     <Content Include="Views\BookOperations\BookIndex.cshtml" />
     <Content Include="Views\Home\Profile.cshtml" />
+    <Content Include="Views\Log\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

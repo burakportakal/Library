@@ -16,7 +16,6 @@ namespace Library.Web.Logger
 {
     public class MessageHandler : DelegatingHandler
     {
-
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var logService = GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(ILogService)) as ILogService;

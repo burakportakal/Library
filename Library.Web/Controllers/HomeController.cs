@@ -13,12 +13,16 @@ namespace Library.Web.Controllers
         }
         public ActionResult Register()
         {
+            if (User.Identity.IsAuthenticated)
+                return RedirectToAction("Index");
             ViewBag.show = "Register";
             return View();
         }
 
         public ActionResult Login()
         {
+            if (User.Identity.IsAuthenticated)
+                return RedirectToAction("Index");
             ViewBag.Show = "Login";
             return View("Register");
         }

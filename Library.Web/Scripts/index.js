@@ -42,6 +42,8 @@ function createTable(data) {
         x += "</th>";
         x += "<th>" + data[i].PublishYear + "</th>";
         x += "<th>" + data[i].Count + "</th>";
+        x += "<th>" + data[i].ReservedCount + "</th>";
+        x += "<th>" + data[i].InLibraryCount + "</th>";
         x += "</tr>";
     }
     x += "</tbody>";
@@ -61,6 +63,8 @@ function createAuthTable(data) {
         x += "</th>";
         x += "<th>" + data[i].PublishYear + "</th>";
         x += "<th>" + data[i].Count + "</th>";
+        x += "<th>" + data[i].ReservedCount + "</th>";
+        x += "<th>" + data[i].InLibraryCount + "</th>";
         x += "<th><button type='button' onclick='reserve(this)' data-id='"+data[i].Isbn+"' class='btn btn-primary'>Kirala</button></th>";
         x += "</tr>";
     }

@@ -13,6 +13,8 @@ namespace Library.Web.Models
         public string BookTitle { get; set; }
         public string PublishYear { get; set; }
         public int Count { get; set; }
+        public int ReservedCount { get; set; }
+        public int InLibraryCount { get; set; }
         public List<AuthorViewModel> Authors { get; set; }
         public List<ReserveBookViewModel> Reserves { get; set; }
         public List<BookIdsViewModel> BookIds { get; set; }

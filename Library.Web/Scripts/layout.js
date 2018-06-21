@@ -81,8 +81,10 @@ $(function () {
                 alert("kitap başarıyla eklendi");
             },
             statusCode : {
-                400 : function() {
-
+                400: function (errors) {
+                    $('#error-list').text('');
+                    for(var i=0;i< errors.responseJSON.length;i++)
+                        $('#error-list').append("<li>" + errors.responseJSON[i] + "</li>");
                 }
             }
         });
@@ -110,6 +112,52 @@ $(function () {
 
 
 });
+function updateBook(url) {
+    var authors = $("#author").val();
+    authors = authors.split(",");
+    var authorList = [];
+    for (var i = 0; i < authors.length; i++) {
+        if (authors[i] != "") {
+            var tempObj = { "AuthorName": authors[i] };
+            authorList.push(tempObj);
+        }
+    }
+    
+    var bookTitle = $("#bookTitle").val();
+    var isbn = $("#isbn").val();
+    var publishYear = $("#publishYear").val();
+    var count = $("#count").val();
+    var postData = {
+        BookTitle: bookTitle, Isbn: isbn, PublishYear: publishYear, Count: count, Author: authorList
+    };
+    $.ajax({
+        type: "PUT",
+        url: "/api/books/",
+        data: postData,
+        headers: headers,
+
+        success: function (response) {
+            alert("Kitap başarıyla güncellendi.");
+        },
+        statusCode: {
+            400: function (errors) {
+                $('#error-list').text('');
+                for (var i = 0; i < errors.responseJSON.length; i++)
+                    $('#error-list').append("<li>" + errors.responseJSON[i] + "</li>");
+            }
+        }
+    });
+};
+function validate(evt) {
+    var theEvent = evt || window.event;
+    var key = theEvent.keyCode || theEvent.which;
+    key = String.fromCharCode(key);
+    var regex = /[0-9]|\./;
+    if (!regex.test(key)) {
+        theEvent.returnValue = false;
+        if (theEvent.preventDefault) theEvent.preventDefault();
+    }
+}
 function showError(obj, error) {
     obj.removeClass("passive-error");
     obj.addClass("active-error");
@@ -157,6 +205,8 @@ function createTable(data) {
         x += "</th>";
         x += "<th>" + data[i].PublishYear + "</th>";
         x += "<th>" + data[i].Count + "</th>";
+        //x += "<th>" + data[i].ReservedCount + "</th>";
+        //x += "<th>" + data[i].InLibraryCount + "</th>";
         x += "<th><a class='badge badge-primary' href=/bookoperations/edit/" + data[i].Isbn + ">Düzenle</a></th>";
         x += "<th><a class='badge badge-primary' id='deleteBook' data-id='" + data[i].Isbn + "' href=/bookoperations/delete/" + data[i].Isbn + ">Sil</a></th>";
         x += "</tr>";
@@ -264,37 +314,6 @@ function createReserveTable(data) {
         " Kirada olan kitap sayisi: "+reservedCount);
     $("#bookReserveData").append(x);
 }
-function updateBook(url){
-    var authors = $("#author").val();
-    authors = authors.split(",");
-    var authorList = [];
-    for (var i = 0; i < authors.length; i++) {
-        var tempObj = { "AuthorName": authors[i] };
-        authorList.push(tempObj);
-    }
-    var bookTitle = $("#bookTitle").val();
-    var isbn = $("#isbn").val();
-    var publishYear = $("#publishYear").val();
-    var count = $("#count").val();
-    var postData = {
-        BookTitle: bookTitle, Isbn: isbn, PublishYear: publishYear, Count: count, Author: authorList
-    };
-    $.ajax({
-        type: "PUT",
-        url: "/api/books/",
-        data: postData,
-        headers: headers,
-
-        success: function (response) {
-            alert("Kitap başarıyla güncellendi.");
-        },
-        statusCode: {
-            400: function () {
-
-            }
-        }
-    });
-};
 function loadEditBook(url) {
     var authors = "";
     $.ajax({
@@ -305,7 +324,7 @@ function loadEditBook(url) {
             $("#bookTitle").val(data.BookTitle);
             $("#isbn").val(data.Isbn);
             $("#publishYear").val(data.PublishYear);
-            $("#count").val(data.Count);
+            $("#count").val(data.BookIds.length);
             for (var i = 0; i < data.Authors.length; i++) {
                 authors += data.Authors[i].AuthorName + ",";
             }

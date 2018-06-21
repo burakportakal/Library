@@ -4,24 +4,33 @@
 
 
 <div id="table"class="container">
-    <table id="bookData" class="table table-bordered">
-        <thead>
-        <tr>
-            <th>Isbn</th>
-            <th>Kitap Adı</th>
-            <th>Yazar</th>
-            <th>Basım Tarihi</th>
-            <th>Adet</th>
-        </tr>
-        </thead>
-    </table>
-</div>
-<div class="row justify-content-end">
-    <div class="col-4" style="margin-right: 18px;">
-        <button type="button" onclick="redirect()" style="float: right;"class="btn btn-primary mb-2">Yeni Kitap Ekle</button>
+    <div class="table-responsive">
+        <table id="bookData" class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Isbn</th>
+                <th>Kitap Adı</th>
+                <th>Yazar</th>
+                <th>Basım Tarihi</th>
+                <th>Adet</th>
+                <th>Kirada</th>
+                <th>Kütüphanede</th>
+            </tr>
+            </thead>
+        </table>
     </div>
 </div>
+<div class="container">
 
+    <div class="row justify-content-between">
+            <div class="col-4"">
+                <a href="/log" style="float: left;" class="btn btn-primary mb-2">Log Sayfası</a>
+            </div>
+            <div class="col-4">
+                <button type="button" onclick="redirect()" style="float: right;"class="btn btn-primary mb-2">Yeni Kitap Ekle</button>
+            </div>
+    </div>
+</div>
 
 
 

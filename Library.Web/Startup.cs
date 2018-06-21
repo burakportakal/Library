@@ -56,6 +56,8 @@ namespace Library.Web
                     .ForMember(dest => dest.Isbn, source => source.MapFrom(title => title.Isbn))
                     .ForMember(dest => dest.PublishYear, source => source.MapFrom(title => title.PublishYear))
                     .ForMember(dest => dest.BookIds,opt=> opt.Ignore())
+                    .ForMember(dest => dest.InLibraryCount,opt=> opt.Ignore())
+                    .ForMember(dest => dest.ReservedCount,opt=> opt.MapFrom(source => source.BookIds.Count(r => r.BookStatus==BookStatus.Reserved)))
                     .ForSourceMember(dest => dest.Authors, opt => opt.Ignore());
 
                 e.CreateMap<Authors, AuthorViewModel>()
