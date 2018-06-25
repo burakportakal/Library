@@ -13,7 +13,7 @@ namespace Library.Web.Models
         public string BookTitle { get; set; }
         public List<AuthorViewModel> Authors { get; set; }
         public BookStatus ReserveState { get; set; }
-        public string UserId { get; set; }
+        public string UserEmail { get; set; }
         public DateTime ReserveDate { get; set; }
         public DateTime ReturnDate { get; set; }
         public DateTime? UserReturnedDate { get; set; }

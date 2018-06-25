@@ -9,13 +9,12 @@ using Library.Model;
 
 namespace Library.Service
 {
-    public interface IBookService
+    public interface IBookService : IService
     {
         IEnumerable<Books> GetBooks();
         IEnumerable<Authors> GetBooksAuthors(string isbn);
         Books GetBook(string isbn);
         void AddBook(Books book);
-        void SaveChanges();
         void UpdateBook(Books book);
         void DeleteBook(string isbn );
     }

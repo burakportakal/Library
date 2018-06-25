@@ -13,7 +13,7 @@ namespace Library.Web.Models
         BookStatus ReserveState { get; set; }
         DateTime ReserveDate { get; set; }
         DateTime ReturnDate { get; set; }
-        string UserId { get; set; }
+        string UserEmail { get; set; }
         DateTime? UserReturnedDate { get; set; }
     }
 }

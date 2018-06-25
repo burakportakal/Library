@@ -9,7 +9,7 @@ using Library.Model;
 
 namespace Library.Service
 {
-    public interface IBookIdService
+    public interface IBookIdService : IService
     {
         IEnumerable<BookIds> GetBookIdsByIsbn(string isbn);
         IEnumerable<BookIds> GetAvailableBooksByIsbn(string isbn);
@@ -17,12 +17,11 @@ namespace Library.Service
         BookIds GetBookIdForReserve(string isbn);
         void GenerateBookIdsForBook(Books book);
         void AddBookId(BookIds book);
-        void SaveChanges();
         void UpdateBookId(BookIds bookId);
         void DeleteBookIds(BookIds bookId);
 
     }
-    public class BookIdService: IBookIdService
+    public class BookIdService : IBookIdService
     {
         private readonly IBookIdRepository bookidsRepository;
         private readonly IReserveRepository reserveRepository;

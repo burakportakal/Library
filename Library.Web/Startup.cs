@@ -28,8 +28,8 @@ namespace Library.Web
                         settings => settings.MapFrom(reserve => reserve.CalculatedReturnDate))
                     .ForMember(isbn => isbn.Isbn,
                         settings => settings.MapFrom(reserve => reserve.BookIds.Isbn))
-                    .ForMember(userId => userId.UserId,
-                        settings => settings.MapFrom(reserve => reserve.UserId))
+                    .ForMember(userId => userId.UserEmail,
+                        settings => settings.MapFrom(reserve => reserve.User.UserName))
                     .ForMember(userReturnedDate => userReturnedDate.UserReturnedDate,
                         settings => settings.MapFrom(reserve => reserve.UserReturnedDate))
                     .ForMember(bookTitle => bookTitle.BookTitle,
@@ -56,6 +56,8 @@ namespace Library.Web
                     .ForMember(dest => dest.Isbn, source => source.MapFrom(title => title.Isbn))
                     .ForMember(dest => dest.PublishYear, source => source.MapFrom(title => title.PublishYear))
                     .ForMember(dest => dest.BookIds,opt=> opt.Ignore())
+                    .ForMember(dest => dest.InLibraryCount,opt=> opt.Ignore())
+                    .ForMember(dest => dest.ReservedCount,opt=> opt.MapFrom(source => source.BookIds.Count(r => r.BookStatus==BookStatus.Reserved)))
                     .ForSourceMember(dest => dest.Authors, opt => opt.Ignore());
 
                 e.CreateMap<Authors, AuthorViewModel>()
@@ -65,19 +67,19 @@ namespace Library.Web
                     .ForSourceMember(author => author.AuthorsId, opt => opt.Ignore());
 
                  e.CreateMap<Reserve, ReserveBookViewModel>()
-                           .ForMember(reserveViewModel => reserveViewModel.UserName,
-                               destReserve => destReserve.MapFrom(reserve => reserve.User.UserName))
-                           .ForMember(reserveViewModel => reserveViewModel.ReserveDate,
-                               destReserve => destReserve.MapFrom(reserve => reserve.DateReserved))
-                           .ForMember(reserveViewModel => reserveViewModel.ReserveId,
-                               destReserve => destReserve.MapFrom(reserve => reserve.ReserveId))
-                           .ForMember(reserveViewModel => reserveViewModel.ReturnDate,
-                               destReserve => destReserve.MapFrom(reserve => reserve.CalculatedReturnDate))
-                           .ForMember(reserveViewModel => reserveViewModel.UserReturnedDate,
-                               destReserve => destReserve.MapFrom(reserve => reserve.UserReturnedDate))
-                           .ForMember(dest => dest.ReserveState, opt => opt.Ignore())
-                           .ForSourceMember(reserve => reserve.BookIds, opt => opt.Ignore())
-                           .ForSourceMember(reserve => reserve.User, opt => opt.Ignore());
+                     .ForMember(reserveViewModel => reserveViewModel.UserName,
+                         destReserve => destReserve.MapFrom(reserve => reserve.User.UserName))
+                     .ForMember(reserveViewModel => reserveViewModel.ReserveDate,
+                         destReserve => destReserve.MapFrom(reserve => reserve.DateReserved))
+                     .ForMember(reserveViewModel => reserveViewModel.ReserveId,
+                         destReserve => destReserve.MapFrom(reserve => reserve.ReserveId))
+                     .ForMember(reserveViewModel => reserveViewModel.ReturnDate,
+                         destReserve => destReserve.MapFrom(reserve => reserve.CalculatedReturnDate))
+                     .ForMember(reserveViewModel => reserveViewModel.UserReturnedDate,
+                         destReserve => destReserve.MapFrom(reserve => reserve.UserReturnedDate))
+                     .ForMember(dest => dest.ReserveState, opt => opt.Ignore())
+                     .ForSourceMember(reserve => reserve.BookIds, opt => opt.Ignore())
+                     .ForSourceMember(reserve => reserve.User, opt => opt.Ignore());
 
                 e.CreateMap<BookIds, BookIdsViewModel>()
                     .ForMember(dest => dest.BookId, source => source.MapFrom(data => data.BookId))
@@ -85,13 +87,16 @@ namespace Library.Web
                     .ForMember(dest => dest.Reserves, opt=> opt.Ignore())
                     .ForSourceMember(source => source.Isbn, opt => opt.Ignore())
                     .ForSourceMember(source => source.Book, opt => opt.Ignore())
-                    .ForSourceMember(source => source.Reserves, opt => opt.Ignore())
-                    ;
+                    .ForSourceMember(source => source.Reserves, opt => opt.Ignore());
             });
                 
             ConfigureAuth(app);
         }
-
+        /// <summary>
+        ///  ReserveBookViewModel için kitabın kütüphanede mi yoksa kirada mı çözen bir fonksiyon.
+        /// </summary>
+        /// <param name="reserve"></param>
+        /// <returns></returns>
         public static object ReserveResolver(Reserve reserve)
         {
             if (reserve.UserReturnedDate != null)

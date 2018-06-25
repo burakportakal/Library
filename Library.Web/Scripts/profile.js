@@ -37,6 +37,7 @@ function createTable(data, i, returned) {
     for (var j = 0; j < data[i].Authors.length; j++) {
         x += data[i].Authors[j].AuthorName + ", ";
     }
+    x = x.substring(0, x.length-2);
     x += "</th>";
     var date = new Date(data[i].ReserveDate);
     x += "<th>" + date.format("dd.mm.yyyy") + "</th>";

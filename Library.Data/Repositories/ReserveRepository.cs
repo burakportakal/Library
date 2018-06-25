@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,13 +27,14 @@ namespace Library.Data
 
         public IEnumerable<Reserve> GetBooksCopyReserveHistory(string bookId)
         {
-            var reserveHistoryForBook = DbContext.Reserve.Where(e => e.BookId == bookId);
+            var reserveHistoryForBook = DbContext.Reserve.Where(e => e.BookId == bookId).Include(e=> e.User);
             return reserveHistoryForBook;
         }
 
         public IEnumerable<Reserve> GetBooksAllReserves(string isbn)
         {
             return DbContext.Reserve.Where(e => e.BookIds.Isbn == isbn);
+           
         }
     }
 

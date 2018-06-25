@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Library.Model;
+using Library.Web.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Web;
-using Library.Model;
-using Library.Web.Models;
 
 namespace Library.Web
 {
@@ -14,9 +15,12 @@ namespace Library.Web
             return new Books();
         }
 
-        public static IAuthors GetAuthorInstance()
+        public static IAuthors GetAuthorInstance(string authorName)
         {
-            return new Authors();
+            return new Authors
+            {
+                AuthorName=authorName
+            };
         }
 
         public static IReserve GetReserveInstace(string userId, BookIds book)
@@ -37,9 +41,20 @@ namespace Library.Web
             return new ReserveViewModel();
         }
 
-        public static ILog GetLogInstance()
+        public static ILog GetLogInstance(string userName,bool isAuthenticated,string clientIp,HttpRequestMessage request,HttpResponseMessage response)
         {
-            return new Log();
+            Log log = new Log();
+            log.IsAuthenticated = isAuthenticated;
+            log.UserName = userName;
+            log.UserHostName = request.Headers.Host;
+            log.UserHostAddress = clientIp;
+            log.UserAgent = request.Headers.UserAgent.ToString();
+            log.RequestDate = DateTime.Now;
+            log.RequestMethod = request.Method.Method;
+            log.RequestUri = request.RequestUri.AbsoluteUri;
+            log.ResponseError = response.ReasonPhrase;
+            log.ResponseStatusCode = response.StatusCode.ToString();
+            return log;
         }
     }
 }

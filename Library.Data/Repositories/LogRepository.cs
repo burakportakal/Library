@@ -31,8 +31,6 @@ namespace Library.Data
     }
     public interface ILogRepository : IRepository<Log>
     {
-        Log GetById(int id);
-        void Delete(Log log);
         IEnumerable<Log> GetByUri(string uri);
     }
 }

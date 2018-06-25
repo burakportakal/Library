@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
 using System.ServiceModel.Channels;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -14,34 +10,39 @@ using Library.Service;
 
 namespace Library.Web.Logger
 {
+    /// <summary>
+    /// Her web api isteği önce burada işlenir.
+    /// </summary>
     public class MessageHandler : DelegatingHandler
     {
-
+        /// <summary>
+        /// Her web api isteği burada Log tablosuna kaydedilir.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var logService = GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(ILogService)) as ILogService;
             var context = request.GetOwinContext().Authentication;
             var response = await base.SendAsync(request, cancellationToken);
             if (response == null)
+            {
                 return null;
+            }
             var isAuthenticated = context.User.Identity.IsAuthenticated;
             var userName = context.User.Identity.Name;
-            //await OutgoingMessageAsync(corrId, requestInfo, responseMessage);
-            var log = Factory.GetLogInstance();
-            log.IsAuthenticated= isAuthenticated;
-            log.UserName = userName;
-            log.UserHostName = request.Headers.Host;
-            log.UserHostAddress = GetClientIp(request);
-            log.UserAgent = request.Headers.UserAgent.ToString();
-            log.RequestDate=DateTime.Now;
-            log.RequestMethod = request.Method.Method;
-            log.RequestUri = request.RequestUri.AbsoluteUri;
-            log.ResponseError = response.ReasonPhrase;
-            log.ResponseStatusCode = response.StatusCode.ToString();
+            var clientIp= GetClientIp(request);
+            var log = Factory.GetLogInstance(userName,isAuthenticated,clientIp,request,response);
             logService.AddLog((Log)log);
             logService.SaveChanges();
             return response;
         }
+        /// <summary>
+        /// İstek yapan kişinin Ip adresini döndürür.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         private string GetClientIp(HttpRequestMessage request = null)
         {
             if (request.Properties.ContainsKey("MS_HttpContext"))
