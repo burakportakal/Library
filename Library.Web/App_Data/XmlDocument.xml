@@ -4,6 +4,13 @@
         <name>Library.Web</name>
     </assembly>
     <members>
+        <member name="M:Library.Web.Startup.ReserveResolver(Library.Model.Reserve)">
+            <summary>
+             ReserveBookViewModel için kitabın kütüphanede mi yoksa kirada mı çözen bir fonksiyon.
+            </summary>
+            <param name="reserve"></param>
+            <returns></returns>
+        </member>
         <member name="M:Library.Web.Areas.HelpPage.ApiDescriptionExtensions.GetFriendlyId(System.Web.Http.Description.ApiDescription)">
             <summary>
             Generates an URI-friendly ID for the <see cref="T:System.Web.Http.Description.ApiDescription"/>. E.g. "Get-Values-id_name" instead of "GetValues/{id}?name={name}"
@@ -527,10 +534,8 @@
         <member name="M:Library.Web.Controllers.BooksController.GetReserve(System.String)">
             <summary>
             İstenen kitabın kiralama geçmişini getirir.
-            
             </summary>
             <param name="isbn"></param>
-            <param name="bookId"></param>
             <returns></returns>
         </member>
         <member name="M:Library.Web.Controllers.BooksController.GetReserve(System.String,System.String)">
@@ -559,6 +564,26 @@
             <summary>
             TÜm Log kayıtlarını getirir.
             </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Library.Web.Logger.MessageHandler">
+            <summary>
+            Her web api isteği önce burada işlenir.
+            </summary>
+        </member>
+        <member name="M:Library.Web.Logger.MessageHandler.SendAsync(System.Net.Http.HttpRequestMessage,System.Threading.CancellationToken)">
+            <summary>
+            Her web api isteği burada Log tablosuna kaydedilir.
+            </summary>
+            <param name="request"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Library.Web.Logger.MessageHandler.GetClientIp(System.Net.Http.HttpRequestMessage)">
+            <summary>
+            İstek yapan kişinin Ip adresini döndürür.
+            </summary>
+            <param name="request"></param>
             <returns></returns>
         </member>
     </members>

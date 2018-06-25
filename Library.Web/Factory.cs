@@ -15,9 +15,12 @@ namespace Library.Web
             return new Books();
         }
 
-        public static IAuthors GetAuthorInstance()
+        public static IAuthors GetAuthorInstance(string authorName)
         {
-            return new Authors();
+            return new Authors
+            {
+                AuthorName=authorName
+            };
         }
 
         public static IReserve GetReserveInstace(string userId, BookIds book)
