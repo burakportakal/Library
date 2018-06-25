@@ -9,7 +9,13 @@ using Library.Model;
 
 namespace Library.Service
 {
-    public class LogService:ILogService
+    public interface ILogService : IService
+    {
+        IEnumerable<Log> GetAllLogs();
+        IEnumerable<Log> GetLogsByUri(string uri);
+        void AddLog(Log log);
+    }
+    public class LogService : ILogService
     {
         private readonly ILogRepository logRepository;
         private readonly IUnitOfWork unitOfWork;
@@ -40,12 +46,6 @@ namespace Library.Service
         }
     }
 
-    public interface ILogService
-    {
-        IEnumerable<Log> GetAllLogs();
-        IEnumerable<Log> GetLogsByUri(string uri);
-        void AddLog(Log log);
-        void SaveChanges();
-    }
+
     
 }

@@ -55,6 +55,7 @@
     <Compile Include="AuthorService.cs" />
     <Compile Include="BookIdService.cs" />
     <Compile Include="BookService.cs" />
+    <Compile Include="IService.cs" />
     <Compile Include="LogService.cs" />
     <Compile Include="ModelFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

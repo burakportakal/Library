@@ -17,6 +17,7 @@ namespace Library.Web.Controllers.Api
         {
             this.logService = logservice;
         }
+
         /// <summary>
         /// TÜm Log kayıtlarını getirir.
         /// </summary>

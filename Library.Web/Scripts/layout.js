@@ -202,11 +202,12 @@ function createTable(data) {
         for (var j = 0; j < data[i].Authors.length; j++) {
             x += data[i].Authors[j].AuthorName + ", ";
         }
+        x = x.substring(0, x.length-2);
         x += "</th>";
         x += "<th>" + data[i].PublishYear + "</th>";
         x += "<th>" + data[i].Count + "</th>";
-        //x += "<th>" + data[i].ReservedCount + "</th>";
-        //x += "<th>" + data[i].InLibraryCount + "</th>";
+        x += "<th>" + data[i].ReservedCount + "</th>";
+        x += "<th>" + data[i].InLibraryCount + "</th>";
         x += "<th><a class='badge badge-primary' href=/bookoperations/edit/" + data[i].Isbn + ">Düzenle</a></th>";
         x += "<th><a class='badge badge-primary' id='deleteBook' data-id='" + data[i].Isbn + "' href=/bookoperations/delete/" + data[i].Isbn + ">Sil</a></th>";
         x += "</tr>";
@@ -257,7 +258,7 @@ function createBookReserveTable(data) {
             x += "<tr class='table-primary'>";
         }
         x += "<th>" + data[i].ReserveId + "</th>";
-        x += "<th>" + data[i].UserId + "</th>";
+        x += "<th>" + data[i].UserEmail + "</th>";
         var date = new Date(data[i].ReserveDate);
         x += "<th>" + date.format("dd.mm.yyyy") + "</th>";
         date = new Date(data[i].ReturnDate);

@@ -9,16 +9,15 @@ using Library.Data.Infastructure;
 
 namespace Library.Service
 {
-    public interface IAuthorService
+    public interface IAuthorService : IService
     {
         IEnumerable<Authors> GetAuthors();
         IEnumerable<Books> GetAuthorsBooks(string authorName);
         Authors GetAuthor(int id);
         Authors GetAuthor(string authorName);
         void AddAuthor(Authors author);
-        void SaveChanges();
     }
-    public class AuthorService :IAuthorService
+    public class AuthorService : IAuthorService
     {
         private readonly IAuthorRepository authorRepository;
         private readonly IUnitOfWork unitOfWork;

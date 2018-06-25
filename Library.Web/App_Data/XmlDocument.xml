@@ -536,7 +536,6 @@
         <member name="M:Library.Web.Controllers.BooksController.GetReserve(System.String,System.String)">
             <summary>
             İstenen kitabın kopyasının kiralama geçmişini getirir.
-            
             </summary>
             <param name="isbn"></param>
             <param name="bookId"></param>
@@ -554,6 +553,12 @@
             Daha önce kiralanmış kitabı iade eder.
             </summary>
             <param name="reserveId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Library.Web.Controllers.Api.LogController.Get">
+            <summary>
+            TÜm Log kayıtlarını getirir.
+            </summary>
             <returns></returns>
         </member>
     </members>

@@ -41,7 +41,7 @@ namespace Library.Web.Controllers
             return RedirectToAction("Index");
         }
         [Authorize]
-        public ActionResult Profile()
+        public new ActionResult Profile()
         {
             return View();
         }

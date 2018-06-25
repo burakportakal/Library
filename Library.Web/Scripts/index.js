@@ -39,6 +39,7 @@ function createTable(data) {
         for (var j = 0; j < data[i].Authors.length; j++) {
             x += data[i].Authors[j].AuthorName + ", ";
         }
+        x = x.substring(0, x.length-2);
         x += "</th>";
         x += "<th>" + data[i].PublishYear + "</th>";
         x += "<th>" + data[i].Count + "</th>";
@@ -60,6 +61,7 @@ function createAuthTable(data) {
         for (var j = 0; j < data[i].Authors.length; j++) {
             x += data[i].Authors[j].AuthorName + ", ";
         }
+        x = x.substring(0, x.length-2);
         x += "</th>";
         x += "<th>" + data[i].PublishYear + "</th>";
         x += "<th>" + data[i].Count + "</th>";

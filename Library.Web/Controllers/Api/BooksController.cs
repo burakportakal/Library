@@ -132,8 +132,7 @@ namespace Library.Web.Controllers
             var book = Mapper.Map<CreateBookViewModel, Books>(value);
             foreach (var author in value.Author)
             {
-                var authorObj = (Authors) Factory.GetAuthorInstance();
-                authorObj.AuthorName = author.AuthorName;
+                var authorObj = (Authors) Factory.GetAuthorInstance(author.AuthorName);
                 var isInDb = authorService.GetAuthor(authorObj.AuthorName);
                 if (isInDb != null)
                 {
@@ -152,7 +151,17 @@ namespace Library.Web.Controllers
             }
             catch (Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
+
+                if (ex.InnerException != null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest,
+                        new { exeption = ex.Message, innerException = ex.InnerException.Message });
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest,
+                        new { exeption = ex.Message });
+                }
             }
         }
 
@@ -182,8 +191,7 @@ namespace Library.Web.Controllers
             var book = Mapper.Map<CreateBookViewModel, Books>(value);
             foreach (var author in value.Author)
             {
-                var authorObj = (Authors)Factory.GetAuthorInstance();
-                authorObj.AuthorName = author.AuthorName;
+                var authorObj = (Authors)Factory.GetAuthorInstance(author.AuthorName);
                 var isInDb = authorService.GetAuthor(authorObj.AuthorName);
                 if (isInDb != null)
                 {
@@ -204,7 +212,16 @@ namespace Library.Web.Controllers
             }
             catch (Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
+                if (ex.InnerException != null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest,
+                        new { exeption = ex.Message, innerException = ex.InnerException.Message });
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest,
+                        new { exeption = ex.Message });
+                }
             }
 
         }
@@ -271,10 +288,8 @@ namespace Library.Web.Controllers
         }
         /// <summary>
         /// İstenen kitabın kiralama geçmişini getirir.
-        /// 
         /// </summary>
         /// <param name="isbn"></param>
-        /// <param name="bookId"></param>
         /// <returns></returns>
         [Route("Reserve/{isbn}")]
         public HttpResponseMessage GetReserve(string isbn)
@@ -287,11 +302,9 @@ namespace Library.Web.Controllers
             }
 
             var viewModel = Mapper.Map<Books, BookViewModel>(book);
-            //var reservesForThisBook = reserveService.GetBooksReserveHistory(isbn);
-            //var reservesViewModel = Mapper.Map<IEnumerable<Reserve>, IEnumerable<ReserveBookViewModel>>(reservesForThisBook);
-            //viewModel.Reserves = reservesViewModel.ToList();
             var bookIds = bookIdService.GetBookIdsByIsbn(isbn);
             var bookIdViewModel = Mapper.Map<IEnumerable<BookIds>, IEnumerable<BookIdsViewModel>>(bookIds).ToList();
+            //Her kopyanın ayrı ayrı kiralama geçmişi getiriliyor.
             foreach (var bookId in bookIdViewModel)
             {
                 var booksReserveHistory = reserveService.GetBooksCopyReserveHistory(bookId.BookId);
@@ -371,7 +384,7 @@ namespace Library.Web.Controllers
             }
 
             var userId = User.Identity.GetUserId();
-            // Kullanıcı kaç tane kiralık kitaba sahip.
+            // Kullanıcı kaç tane kiralık kitaba ve hangi kitaplara sahip.
             var reservedBooks = reserveService.GetBooksUserStillHave(userId);
             //Aynı kitabı iki kere vermeyelim
             var userReservedThisBook = reservedBooks.Any(e => e.BookIds.Isbn == isbn);
